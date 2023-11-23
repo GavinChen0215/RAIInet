@@ -1,11 +1,4 @@
-class Observer {
- public:
-  virtual void notify(Link &link) = 0;
-  virtual ~Observer() = default;
-};
-
-
-class Link : public Observer{
+class Link{
 private:
     char type; // 'D' for data, 'V' for virus
     int strength; // Strength of the link [1,2,3,4]
@@ -14,7 +7,6 @@ private:
     bool visible; // visibility of enemy player
 public:
     Link(char type, int strength, int owner, bool visible);
-    void notify(Link &link) override;
     char getType() const;
     int getStrength() const;
     int getRow() const;
@@ -27,7 +19,6 @@ public:
     void toggleState();
     void toggleVisible();
     void interactWith(Link& otherLink); // New method for combat
-    // Other necessary methods
 };
 
 
@@ -116,7 +107,7 @@ public:
     friend std::ostream &operator<<(std::ostream &out, const Board &board);
 };
 
-class Display : public Observer{ //textdisplay
+class Display { //textdisplay
 private:
     std::vector<std::vector<char>> theDisplay;
     int gridSize;
