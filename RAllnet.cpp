@@ -97,7 +97,7 @@ public:
 class Board { // grid
 private:
     // Assuming an 8x8 board, based on the game description.
-    std::vector<std::vector<Link*>> theBorad;
+    std::vector<std::vector<Link>> theBorad;
     int boardSize;
     bool gameOver; // Flag to indicate if the game is over.
     Player players[2];
