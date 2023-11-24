@@ -39,6 +39,7 @@ public:
 
 class Firewall : public Ability {
     Board board;
+    int r, c;
 public:
     void use() override;
 };
@@ -82,9 +83,6 @@ public:
     void addAbility(const Ability& ability);
 };
 
-
-
-
 class Board { // grid
 private:
     // Assuming an 8x8 board, based on the game description.
@@ -94,7 +92,6 @@ private:
     Player players[2];
     int currentPlayer; // Track the current player (player 1 or player 2).
     Display *display;
-    
 
 public:
     Board();
@@ -104,19 +101,17 @@ public:
     void moveLink(Link& link, Direction dir); // Move a link on the board
     bool checkGameState(); // Check if a win/lose condition is met
     void handleLinkBattle(Link& attacker, Link& defender);
+    Player getPlayer();
+    Player getOppponet();
+    friend std::ostream &operator<<(std::ostream &out, const Board &board);
 };
-
-std::ostream &operator<<(std::ostream &out, const Board &board);
 
 class Display { //textdisplay
 private:
     std::vector<std::vector<char>> theDisplay;
     int boardSize;
-    Board board;
 public:
     Display(int n); //ctor
-    void updateBoard(); // Update internal board representation
-    void displayPlayerStats();
+    void updateDisplay(); // Update internal board representation
+    friend std::ostream &operator<<(std::ostream &out, const Display &display);
 };
-
-std::ostream &operator<<(std::ostream &out, const Display &display);
