@@ -3,6 +3,7 @@ private:
     char type; // 'D' for data, 'V' for virus
     int strength; // Strength of the link [1,2,3,4]
     int row, col; // position
+    int range;
     bool state; // whether it is downloaded
     bool visible; // visibility of enemy player
 public:
@@ -11,14 +12,16 @@ public:
     int getStrength() const;
     int getRow() const;
     int getCol() const;
+    int getRange() const;
     bool getState() const;
     bool getVisible() const;
     void toggleType();
+    void boostRange();
     void setRow(int row);
     void setCol(int col);
     void toggleState();
     void toggleVisible();
-    void interactWith(Link& otherLink); // New method for combat
+    void battleWith(Link& otherLink); // New method for combat
 };
 
 
