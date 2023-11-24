@@ -104,17 +104,19 @@ public:
     void moveLink(Link& link, Direction dir); // Move a link on the board
     bool checkGameState(); // Check if a win/lose condition is met
     void handleLinkBattle(Link& attacker, Link& defender);
-    friend std::ostream &operator<<(std::ostream &out, const Board &board);
 };
+
+std::ostream &operator<<(std::ostream &out, const Board &board);
 
 class Display { //textdisplay
 private:
     std::vector<std::vector<char>> theDisplay;
-    int gridSize;
+    int boardSize;
     Board board;
 public:
     Display(int n); //ctor
     void updateBoard(); // Update internal board representation
     void displayPlayerStats();
-    friend std::ostream &operator<<(std::ostream &out, const Display &display);
 };
+
+std::ostream &operator<<(std::ostream &out, const Display &display);
