@@ -32,34 +32,34 @@ public:
 };
 
 class LinkBoost : public Ability {
-    Link& link;
+    Link link;
 public:
     void use() override;
 };
 
 class Firewall : public Ability {
-    Board board;
+    Board *board;
     int r, c;
 public:
     void use() override;
 };
 
 class Download : public Ability {
-    Link& link;
-    Board board;
+    Link link;
+    Board *board;
 public:
     void use() override;
 };
 
 class Polarize : public Ability {
-    Link& link;
+    Link link;
 public:
-    void use(Link& link) override;
+    void use() override;
 };
 
 class Scan : public Ability {
-    Link& link;
-    Board board;
+    Link link;
+    Board *board;
 public:
     void use() override;
 };
@@ -71,13 +71,11 @@ private:
     std::vector<std::unique_ptr<Ability>> abilities; // Player's abilities
     int downloadedData; // Count of downloaded data
     int downloadedViruses; // Count of downloaded viruses
-
-    void downloadLink(Link& link); // Handle downloading a link
 public:
     Player(int playerNumber);
     int getData() const;
     int getViruses() const;
-    void moveLink(); // Manage player's links
+    void downloadLink(Link &link); // Handle downloading a link
     void useAbility(int ID); // Use an ability
     void addLink(const Link& link);
     void addAbility(const Ability& ability);
@@ -86,21 +84,22 @@ public:
 class Board { // grid
 private:
     // Assuming an 8x8 board, based on the game description.
-    std::vector<std::vector<Link>> theBorad;
+    std::vector<std::vector<std::unique_ptr<Link>>> theBorad;
     int boardSize;
     bool gameOver; // Flag to indicate if the game is over.
     Player players[2];
     int currentPlayer; // Track the current player (player 1 or player 2).
-    Display *display;
 
 public:
     Board();
     init(int n); // ctor
+    void updateBoard();
     void placeLink(const Link& link); // Place a link on the board
     enum Direction {UP, DOWN, LEFT, RIGHT};
     void moveLink(Link& link, Direction dir); // Move a link on the board
     bool checkGameState(); // Check if a win/lose condition is met
     void handleLinkBattle(Link& attacker, Link& defender);
+    
     Player getPlayer();
     Player getOppponet();
     friend std::ostream &operator<<(std::ostream &out, const Board &board);
@@ -109,7 +108,7 @@ public:
 class Display { //textdisplay
 private:
     std::vector<std::vector<char>> theDisplay;
-    int boardSize;
+    std::unique_ptr<Board> board;
 public:
     Display(int n); //ctor
     void updateDisplay(); // Update internal board representation
