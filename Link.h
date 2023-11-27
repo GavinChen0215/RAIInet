@@ -12,8 +12,8 @@ class Link {
     bool isDownload;  // whether the Link has been downloaded
 
   public:
-    // constructor
-    Link(char type, int strength, int r, int c, int range, bool visibility, bool isDowdload);
+    // constructor, default: range == 1, visibility == isDownload == false
+    Link(char type, int strength, int r, int c);
     // accessor
     char getType() const;
     char getStrength() const;
@@ -25,8 +25,8 @@ class Link {
     // mutator
     void toggleType();
     void boostRange();  // for the purpose of the ability "LinkBoost"
-    void setRow(int row);
-    void setCol(int col);
+    void setRow(int r);
+    void setCol(int c);
     void toggleState();
     void toggleVisbility();
     // other methods
