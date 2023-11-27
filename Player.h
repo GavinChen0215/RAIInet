@@ -10,7 +10,7 @@ class Player {
     std::vector<std::unique_ptr<Link>> links;  // The Links that a Player owns
     std::vector<std::unique_ptr<Ability>> abilities;  // The Abilities that a Player owns
     int downloadedData;  // the number of data that has been downloaded
-    int donwloadedVirus;  // the number of virus that has been downloded
+    int downloadedVirus;  // the number of virus that has been downloded
   public:
     Player(int playerNumber);
     int getData() const;
