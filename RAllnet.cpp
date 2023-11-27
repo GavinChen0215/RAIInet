@@ -23,7 +23,7 @@ public:
     void toggleVisible();
     void battleWith(Link& otherLink); // New method for combat
 };
-
+11111111111
 
 class Ability { // Decorator
     bool state;
