@@ -4,12 +4,7 @@
 using namespace std;
 
 Link::Link(char type, int strength, int r, int c):
-    type{type}, strength{strength}, row{r}, col{c} {
-    // give the following fields default values
-    range = 1;
-    visibility = false;
-    isDownload = false;
-}
+    type{type}, strength{strength}, row{r}, col{c} {}
 
 // accessor
 char Link::getType() const { return type; } 

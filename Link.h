@@ -7,9 +7,10 @@ class Link {
     char type;  // 'D' for data, 'V' for virus
     int strength;  // strength of the Link, [1, 2, 3, 4]
     int row, col;  // position of the Link
-    int range;  // how many grid can a Link move at a time
-    bool visibility;  // whether the Link is visible to the opponent
-    bool isDownload;  // whether the Link has been downloaded
+    // the following fields have default values
+    int range = 1;  // how many grid can a Link move at a time
+    bool visibility = false;  // whether the Link is visible to the opponent
+    bool isDownload = false;  // whether the Link has been downloaded
 
   public:
     // constructor, default: range == 1, visibility == isDownload == false

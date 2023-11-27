@@ -7,10 +7,10 @@
 
 class Board {
     std::vector<std::vector<std::unique_ptr<Link>>> theBoard;
-    int boardSize;
-    bool gameOver;  // Flag to indicate if the game is over
+    int boardSize = 8;  // DOUBLE CHECK THIS
+    bool gameOver = false;  // Flag to indicate if the game is over
     Player players[2];  // since RAIInet is a 2-player game
-    int currentPlayer;  // Track the current player (p1 or p2)
+    int currentPlayer = 0;  // Track the current player (p0 or p1)
 
   public:
     Board();
