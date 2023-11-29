@@ -9,7 +9,7 @@ class Display {
     std::unique_ptr<Board> board;
 
   public:
-    Display(int n);  // constructor
+    Display();  // constructor
     void updateDisplayer();  // Update internal board representation
     friend std::ostream &operator<<(std::ostream &out, const Display &display);
 };
