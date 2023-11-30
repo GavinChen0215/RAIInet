@@ -24,10 +24,10 @@ void Link::boostRange() { range = 2; }  // change the range to 2, after using "L
 void Link::setRow(int r) { row = r; }
 void Link::setCol(int c) { col = c; }
 void Link::toggleState() {
-    isDownload ? false : true;  // negate the isDownload field
+    isDownload = (isDownload) ? false : true;  // negate the isDownload field
 }
 void Link::toggleVisbility() {
-    visibility ? false : true;  // negate the visibility field
+    visibility = (visibility) ? false : true;  // negate the visibility field
 }
 
 void Link::battleWith(Link &otherlink) {

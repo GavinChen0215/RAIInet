@@ -6,12 +6,12 @@
 
 // Decorator Pattern will be used here
 class Ability {  // Abstract superclass
-    bool state;
+    bool state = true;
 
   public:
     virtual void use() = 0;  // pure virtual method
     bool getState() const;
-    void toggleState() const;
+    void toggleState();
     virtual ~Ability() {}
 };
 
