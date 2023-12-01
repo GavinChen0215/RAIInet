@@ -1,5 +1,22 @@
-class Link {
+class Link;
+
+/*
+#include "Link.h"
+*/
+
+class Observer {
+ public:
+  virtual void notify(Link *lp) = 0;  // c is the Cell that called the notify method
+  virtual ~Observer() = default;
+};
+
+/*
+#include "Observer.h"
+*/
+
+class Link: public Observer {
     char type;  // 'D' for data, 'V' for virus
+    char letter; // a-h / A-H
     int strength;  // strength of the Link, [1, 2, 3, 4]
     int row, col;  // position of the Link
     // the following fields have default values
@@ -7,13 +24,15 @@ class Link {
     bool visibility = false;  // whether the Link is visible to the opponent
     bool isDownload = false;  // whether the Link has been downloaded
 
+    std::vector<Observer*> observers;  // Observers to be notified
   public:
     // constructor, default: range == 1, visibility == isDownload == false
-    Link(char type, int strength, int r, int c):
-        type{type}, strength{strength}, row{r}, col{c} {}
+    Link(char type, char letter; int strength, int r, int c):
+        type{type}, letter{letter}, strength{strength}, row{r}, col{c} {}
     // accessor
     char getType() const { return type; } 
-    char getStrength() const { return strength; }
+    char getLetter() const { return letter; }
+    int getStrength() const { return strength; }
     int getRow() const { return row; }
     int getCol() const { return col; }
     int getRange() const { return range; }
@@ -22,18 +41,52 @@ class Link {
     // mutator
     void toggleType() {
         (type == 'D') ? type = 'V' : type = 'D';  // change 'D' to 'V', 'V' to 'D'
+        notifyObservers();
     } 
-
-    void boostRange() { range = 2; }  // change the range to 2, after using "LinkBoost"
-    void setRow(int r) { row = r; }
-    void setCol(int c) { col = c; }
+    void setLetter(char c) {
+        letter = c;
+    }
+    void boostRange() {
+        range = 2;
+        notifyObservers();
+    }  // change the range to 2, after using "LinkBoost"
+    void setRow(int r) {
+        row = r;
+        notifyObservers();
+    }
+    void setCol(int c) {
+        col = c;
+        notifyObservers();
+    }
     void toggleState() {
-        isDownload = true;  // negate the isDownload field
+        isDownload = true; // negate the isDownload field
+        notifyObservers();
     }
     void toggleVisbility() {
         visibility = true;  // negate the visibility field
+        notifyObservers();
+    }
+    void attachObserver(Observer* obs) {
+        observers.emplace_back(obs);
+    }
+
+    void detachObserver(Observer* obs) {
+        observers.erase(std::remove(observers.begin(), observers.end(), obs), observers.end());
+    }
+
+    void notifyObservers() {
+        for (Observer* obs : observers) {
+            obs->notify(this);
+        }
     }
 };
+
+/*
+#include <vector>
+#include <memory>
+#include "Link.h" 
+#include "Ability.h"
+*/
 
 class Player {
     int playerNumber;
@@ -46,182 +99,145 @@ class Player {
 
     int getData() const { return downloadedData; }
     int getViruses() const { return downloadedVirus; }
-    Link getLink(int n) {
-        return *(links[n]);
+    Link* getLink(char letter) {
+        for (auto& link : links) {
+            if (link->getLetter() == letter) {
+                return link.get();
+            }
+        }
+        return nullptr;
     }
-    void downloadLink(Link &link) {
-        link.toggleState();
-        link.toggleVisbility();
-        if (link.getType() == 'D') {
-            ++downloadedData;
-        } else {
-            ++downloadedVirus;
+   void downloadLink(Link* link) {
+        if (link) {
+            link->toggleState();
+            link->toggleVisbility();
+            if (link->getType() == 'D') {
+                ++downloadedData;
+            } else {
+                ++downloadedVirus;
+            }
         }
     }
-    void useAbility(int ID) {
-        abilities[ID - 1]->use();
+    void useAbility(int ID, Board* b) {
+        abilities[ID - 1]->use(b);
     }
     void addLink(const Link link) {
         links.emplace_back(std::make_unique<Link>(link));
     }
     void addAbility(const Ability ability) {
         abilities.emplace_back(std::make_unique<Ability>(ability));
-    }
+    } 
 };
 
+class Board;
 class Ability {  // Abstract superclass
     bool state = true;
-
   public:
-    virtual void use() = 0;  // pure virtual method
+    virtual void use(Board* board) = 0;  // pure virtual method
     bool getState() const { return state; }
-    void toggleState() { state = !state; }
-    virtual ~Ability() {}
+    void toggleState() { state = false; }
+    virtual ~Ability() = default;
 };
 
-class Decorator: public Ability {
- protected:
-    std::unique_ptr<Ability> component;
- public:
-    Decorator(std::unique_ptr<Ability> comp) : component(std::move(comp)) {}
-    virtual ~Decorator() {}
-
-    void use() override {
-        if (component) {
-            component->use();  // Delegate to the wrapped component
-        }
-    }
-};
-
-class LinkBoost : public Decorator {
-    Board* board;
+class LinkBoost : public Ability {
 public:
-    LinkBoost(std::unique_ptr<Ability> comp, Board* b):
-        Decorator(std::move(comp)), board(b) {}
-    void use() override {
+    void use(Board* board) override {
         char l;
         cin >> l;
-        int n = -1;
         int currPlayer = board->getCurrent();
         if ('a' <= l && l <= 'h' && currPlayer == 0) {
-            n = l - 'a';
+            board->getPlayer(0).getLink(l).boostRange();
         } else if ('A' <= l && 'H' <= l && currPlayer == 1) {
-            n = l - 'A';
+            board->getPlayer(1).getLink(l).boostRange();
         } else {
             std::cerr << "Please provide a correct link value" << std::endl;
         }
-        if (n != -1) {
-            board->getPlayer(currPlayer).getLink(n).boostRange();
-        }
     }
 };
 
-class Firewall : public Decorator {
-    Board* board;
-
+class Firewall : public Ability {
 public:
-    Firewall(std::unique_ptr<Ability> comp, Board* b):
-        Decorator(std::move(comp)), board(b) {}
+    Firewall(Board* b): board(b) {}
 
     void use() override {
         int r, c;
         cin >> r >> c;
-        if (board) {
-            // Example: Implement Firewall logic here
-            std::cout << "Activating Firewall at (" << r << ", " << c << ")" << std::endl;
-        }
+
     }
 };
 
-class Download : public Decorator {
-    Board* board;
+class Download : public Ability {
 
 public:
-    Download(std::unique_ptr<Ability> comp, Board* b): 
-        Decorator(std::move(comp)), board(b) {}
-
-    void use() override {
+    void use(Board* board) override {
         char l;
         cin >> l;
-        int n = -1;
         int currPlayer = board->getCurrent();
         if ('a' <= l && l <= 'h' && currPlayer == 1) {
-            n = l - 'a';
+            Link link = board->getPlayer(0).getLink(l);
+            board->getPlayer(1).downloadLink(link);
         } else if ('A' <= l && 'H' <= l && currPlayer == 0) {
-            n = l - 'A';
+            Link link = board->getPlayer(1).getLink(l);
+            board->getPlayer(0).downloadLink(link);
         } else {
             std::cerr << "Please provide a correct link value" << std::endl;
-        }
-        if (n != -1) {
-            Link link = board->getPlayer(1 - currPlayer).getLink(n);
-            board->getPlayer(currPlayer).downloadLink(link);
         }
     }
 };
 
 // Polarize Decorator
-class Polarize : public Decorator {
-    Board* board;
+class Polarize : public Ability {
 public:
-    Polarize(std::unique_ptr<Ability> comp, Board* b):
-        Decorator(std::move(comp)), board(b) {}
 
-    void use() override {
+    void use(Board* board) override {
         char l;
         cin >> l;
-        int n = -1;
-        int player;
         if ('a' <= l && l <= 'h') {
-            n = l - 'a';
-            player = 0;
+            board->getPlayer(0).getLink(l).toggleType();
         } else if ('A' <= l && 'H' <= l) {
-            n = l - 'A';
-            player = 1;
+            board->getPlayer(1).getLink(l).toggleType();
         } else {
             std::cerr << "Please provide a correct link value" << std::endl;
-        }
-        if (n != -1) {
-            board->getPlayer(player).getLink(n).toggleType();
         }
     }
 };
 
 // Scan Decorator
-class Scan : public Decorator {
-    Board* board;
+class Scan : public Ability {
 
 public:
-    Scan(std::unique_ptr<Ability> comp, Board* b):
-        Decorator(std::move(comp)), board(b) {}
 
-    void use() override {
+    void use(Board* board) override {
         char l;
         cin >> l;
-        int n = -1;
-        int player;
         if ('a' <= l && l <= 'h') {
-            n = l - 'a';
-            player = 0;
+            board->getPlayer(0).getLink(l).toggleVisbility();
         } else if ('A' <= l && 'H' <= l) {
-            n = l - 'A';
-            player = 1;
+            board->getPlayer(1).getLink(l).toggleVisbility();
         } else {
             std::cerr << "Please provide a correct link value" << std::endl;
-        }
-        if (n != -1) {
-            board->getPlayer(player).getLink(n).toggleVisbility();
         }
     }
 };
 
 // 3 more new abilities
 
-class Board {
+/*
+#include <vector>
+#include <iostream>
+#include <memory>
+#include "Link.h"   
+#include "Player.h" 
+#include "Observer.h"
+*/
+
+class Board : public Observer{
     std::vector<std::vector<std::unique_ptr<Link>>> theBoard;
     int boardSize = 8;  // Board size for RAIInet
-    bool gameOver = false; 
+    bool isWon = false; 
     Player players[2];
     int currentPlayer = 0;
+    std::unique_ptr<Display> display = nullpter;
 
 public:
     // Constructor
@@ -237,35 +253,44 @@ public:
             players[i] = Player(i);
             std::vector<int> str = {1, 2, 3, 4, 1, 2, 3, 4};
             std::vector<char> types = {'D', 'D', 'D', 'D', 'V', 'V', 'V', 'V'};
-
-
+            std::vector<char> letter1 = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+            std::vector<char> letter2 = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'};
+            
             // Use a random device to generate a seed
             std::random_device rd;  
             std::mt19937 rng(rd()); // Standard mersenne_twister_engine seeded with rd()
-
             // Shuffle the vector
             std::shuffle(str.begin(), str.end(), rng);
 
             std::mt19937 rng(rd()); // Standard mersenne_twister_engine seeded with rd()
-
             // Shuffle the vector
             std::shuffle(types.begin(), types.end(), rng);
+
+            std::mt19937 rng(rd()); // Standard mersenne_twister_engine seeded with rd()
+            // Shuffle the vector
+            std::shuffle(letter1.begin(), letter1.end(), rng);
+
+            std::mt19937 rng(rd()); // Standard mersenne_twister_engine seeded with rd()
+            // Shuffle the vector
+            std::shuffle(letter2.begin(), letter2.end(), rng);
 
             for (int j = 0; j < 8; ++j) {
                 if (i = 0) {
                     if (j = 3 || j = 4) {
-                        l = Link(types[j], str[j], 1, j);
+                        Link l{types[j], letter1[j], str[j], 1, j};
                     } else {
-                        l = Link(types[j], str[j], 0, j);
+                        Link l{types[j], letter1[j], str[j], 0, j};
                     }
                 } else {
                     if (j = 3 || j = 4) {
-                        l = Link(types[j], str[j], 7, j);
+                        Link l{types[j], letter2[j], str[j], 7, j};
                     } else {
-                        l = Link(types[j], str[j], 8, j);
+                        Link l{types[j], letter2[j], str[j], 8, j};
                     }
                 }
+                l.attachObserver(this);
                 players[i].addLink(l);
+                placeLink(*link, link->getRow(), link->getCol());
             }
         }
     }
@@ -279,7 +304,12 @@ public:
     // Place a link on the board
     void placeLink(const Link& link, int row, int col) {
         if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
-            theBoard[row][col] = std::make_unique<Link>(link);
+            if (!theBoard[row][col]) {
+                // Place a new link only if the cell is empty
+                theBoard[row][col] = std::make_unique<Link>(link);
+            } else {
+                std::cerr << "Cell is already occupied" << std::endl;
+            }
         } else {
             std::cerr << "Invalid position" << std::endl;
         }
@@ -292,18 +322,25 @@ public:
     void moveLink(Link& link, Direction dir) {
         int row = link.getRow();
         int col = link.getCol();
+        int newRow = row;
+        int newCol = col;
+
         switch (dir) {
-            case UP:    row -= link.getRange(); break;
-            case DOWN:  row += link.getRange(); break;
-            case LEFT:  col -= link.getRange(); break;
-            case RIGHT: col += link.getRange(); break;
+            case UP:    newRow -= link.getRange(); break;
+            case DOWN:  newRow += link.getRange(); break;
+            case LEFT:  newCol -= link.getRange(); break;
+            case RIGHT: newCol += link.getRange(); break;
         }
 
-        if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
-            // Move link to new position and clear old position
-            theBoard[row][col] = std::move(theBoard[link.getRow()][link.getCol()]);
-            link.setRow(row);
-            link.setCol(col);
+        if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
+            if (!theBoard[newRow][newCol]) {
+                theBoard[newRow][newCol] = std::move(theBoard[row][col]);
+                link.setRow(newRow);
+                link.setCol(newCol);
+            } else {
+                // Handle the situation when the new cell is occupied (possible battle)
+                handleLinkBattle(link, *(theBoard[newRow][newCol]));
+            }
         } else {
             std::cerr << "Move out of bounds" << std::endl;
         }
@@ -311,13 +348,18 @@ public:
 
     // Check if a win/lose condition is met
     bool checkGameState() {
-        // Implement game state checking logic
-        return gameOver;
+        return isWon;
     }
 
     // Handle a battle between two links
     void handleLinkBattle(Link& attacker, Link& defender) {
-        // Battle logic
+        int a = attacker.getStrength();
+        int d = defender.getStrength();
+        if (a >= d) {
+            players[currentPlayer].downloadLink(defender);
+        } else {
+            players[1 - currentPlayer].downloadLink(defender);
+        }
     }
 
     // Getters for players
@@ -325,66 +367,62 @@ public:
         return players[playerNum];
     }
 
-    Player& getOpponent(int currentPlayer) {
-        return players[1 - currentPlayer];
+    friend std::ostream &operator<<(ostream &out, const Board *b) {
+        if (b.td) out << *(b.td);
+        return out;
     }
 };
 
-// Overload the output operator to display the board
-std::ostream &operator<<(std::ostream &out, const Board &board) {
-    for (int i = 0; i < board.boardSize; ++i) {
-        for (int j = 0; j < board.boardSize; ++j) {
-            if (board.theBoard[i][j]) {
-                out << board.theBoard[i][j]->getType() << ' ';
-            } else {
-                out << ". ";
-            }
-        }
-        out << std::endl;
-    }
-    return out;
-}
+/*
+#include <vector>
+#include <iostream>
+#include "Observer.h"
+#include "Link.h"
+*/
 
-class Display {
+class Display : public Observer {
     std::vector<std::vector<char>> theDisplay;
-    std::unique_ptr<Board> board;
+    const int boardSize = 8;  // Assuming board size is 8x8
 
 public:
     // Constructor
-    Display(std::unique_ptr<Board> b) : board(std::move(b)) {
-        theDisplay.resize(board->getBoardSize(), std::vector<char>(board->getBoardSize(), '.'));
+    Display() : theDisplay(boardSize, std::vector<char>(boardSize, '.')) {}
+
+    // Observer's notify method implementation
+    void notify(Link* lp) override {
+        if (lp) {
+            int row = lp->getRow();
+            int col = lp->getCol();
+            char displayChar = '.';
+
+            if (!lp->getState()) {
+                // Display the link's letter if it is visible and not downloaded
+                displayChar = lp->getLetter();
+            }
+
+            if (row >= 0 && row < boardSize && col >= 0 && col < boardSize) {
+                theDisplay[row][col] = displayChar;
+            }
+        }
     }
 
-    // Update the internal representation of the board
-    void updateDisplay() {
-        // Clear the current display
+    void resetDisplay() {
         for (auto& row : theDisplay) {
             std::fill(row.begin(), row.end(), '.');
         }
-
-        // Update the display based on the current state of the board
-        for (int i = 0; i < board->getBoardSize(); ++i) {
-            for (int j = 0; j < board->getBoardSize(); ++j) {
-                auto& link = board->getLinkAt(i, j);
-                if (link) {
-                    theDisplay[i][j] = link->getType();
-                }
-            }
-        }
     }
 
-    // Output the current state of the display
-    void render() const {
-        for (const auto& row : theDisplay) {
-            for (char cell : row) {
-                std::cout << cell << ' ';
-            }
-            std::cout << '\n';
+    friend ostream &operator<<(ostream &out, const Display &d) {
+    // Output the display grid to the stream based on the state of every cell
+    out << "========" << endl;
+    for (auto row : d.theDisplay) {
+        for (char link : row) {
+            out << link;
         }
+        out << endl;
     }
-
-    // Friend declaration for output operator
-    friend std::ostream &operator<<(std::ostream &out, const Display &display);
+    out << "========" << endl;
+    return out;
 };
 
 // Overload the output operator to display the board
@@ -393,28 +431,46 @@ std::ostream &operator<<(std::ostream &out, const Display &display) {
     return out;
 }
 
+/*
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <memory>
-#include "Board.h"   // Assuming Board is defined in Board.h
-#include "Display.h" // Assuming Display is defined in Display.h
-#include "Link.h"    // Assuming Link is defined in Link.h
-
-int main() {
+#include "Board.h" 
+#include "Display.h"
+#include "Link.h"
+*/
+int main(int argc, char* argv[]) {
     std::unique_ptr<Board> board = std::make_unique<Board>();
-    Display display(std::move(board)); // Create a display for the board
+    Display display;  // The display for the board
+
+    // Parse command-line arguments for setup
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "-ability1") {
+            // Example: Process abilities for player 1
+        } else if (arg == "-ability2") {
+            // Example: Process abilities for player 2
+        } else if (arg == "-link1") {
+            // Example: Process link placement for player 1
+        } else if (arg == "-link2") {
+            // Example: Process link placement for player 2
+        }
+        // -graphics later
+    }
+
+    board->init();  // Initialize the board with players and links
+    display.resetDisplay();  // Reset the display for the new game
+
     std::string cmd;
     int currentPlayer = 0;  // Start with player 0
 
+    // Game loop
     while (true) {
-        std::cout << "Enter command: ";
+        std::cout << "Player " << currentPlayer + 1 << ", enter command: ";
         std::cin >> cmd;
 
-        if (cmd == "new") {
-            board->init();  // Initialize the board with players
-            display.updateDisplay();
-        } 
-        else if (cmd == "move") {
+        if (cmd == "move") {
             char value;
             std::cin >> value;
 
@@ -432,24 +488,32 @@ int main() {
             board->moveLink(movingLink, dir); // Move the link
             display.updateDisplay();
             currentPlayer = 1 - currentPlayer; // Switch players
-        } 
-        else if (cmd == "ability") {
+        } else if (cmd == "ability") {
             int ID;
             std::cin >> ID;
             board->getPlayer(currentPlayer).useAbility(ID); // Use an ability
             display.updateDisplay();
-        } 
-        else if (cmd == "status") {
-            // Implement status display logic
-            // This may involve displaying the number of downloaded links, remaining abilities, etc.
-        } 
-        else if (cmd == "quit") {
+        } else if (cmd == "abilities") {
+            // Display available abilities
+        } else if (cmd == "board") {
+            // Display the current state of the board
+            std::cout << *board;
+        } else if (cmd == "sequence") {
+            std::string filename;
+            std::cin >> filename;
+            // Execute commands from a file
+        } else if (cmd == "quit") {
             std::cout << "Quitting the game." << std::endl;
-            break; // Exit the game loop
-        } 
-        else {
+            break;
+        } else {
             std::cerr << "Invalid command." << std::endl;
         }
 
-        std::cout << display; // Display the board after each command
+        if (board->checkGameState()) {
+            std::cout << "Player " << currentPlayer + 1 << " wins!" << std::endl;
+            break;
+        }
+        cout << display;
     }
+    return 0;
+}
