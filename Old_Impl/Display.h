@@ -6,11 +6,11 @@
 
 class Display {
     std::vector<std::vector<char>> theDisplay;
-    int boardSize = 8;
+    std::unique_ptr<Board> board;
 
   public:
     Display();  // constructor
-    void notify(Board &board);
+    void updateDisplayer();  // Update internal board representation
     friend std::ostream &operator<<(std::ostream &out, const Display &display);
 };
 

@@ -3,22 +3,23 @@
 
 #include <vector>
 #include "Link.h"
-#include "Ability.h"
+// #include "Ability.h"
 
 class Player {
-    int playerNumber;
-    std::vector<std::unique_ptr<Link>> links;  // The Links that a Player owns
-    std::vector<std::unique_ptr<Ability>> abilities;  // The Abilities that a Player owns
+    int playerNumber;  // either 0 or 1, indicating the two players in the game
+    std::vector<std::unique_ptr<Link>> links;  // array of unique_ptr to Links that a Player owns
     int downloadedData;  // the number of data that has been downloaded
     int downloadedVirus;  // the number of virus that has been downloded
+
   public:
-    Player(int playerNumber);
-    int getData() const;
-    int getViruses() const;
+    Player(int playerNumber); // ctor
+    int getData() const;  // # of data downloaded
+    int getVirus() const; // # of virus donwloaded
+
     void downloadLink(Link &link); // Handle downloading a link
-    void useAbility(int ID); // Use an ability
+    
+    // --- DOUBLE-CHECK addLink ---
     void addLink(const Link& link);
-    void addAbility(const Ability& ability);
 };
 
 #endif
