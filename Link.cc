@@ -3,8 +3,7 @@
 
 using namespace std;
 
-Link::Link(char type, int strength, int r, int c):
-    type{type}, strength{strength}, row{r}, col{c} {}
+Link::Link(char type, int strength): type{type}, strength{strength} {}
 
 // accessor
 char Link::getType() const { return type; } 

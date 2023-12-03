@@ -2,23 +2,26 @@
 #define __PLAYER__H__
 
 #include <vector>
+#include <string>
 #include "Link.h"
-#include "Ability.h"
+using namespace std;
 
 class Player {
     int playerNumber;
-    std::vector<std::unique_ptr<Link>> links;  // The Links that a Player owns
-    std::vector<std::unique_ptr<Ability>> abilities;  // The Abilities that a Player owns
-    int downloadedData;  // the number of data that has been downloaded
-    int downloadedVirus;  // the number of virus that has been downloded
+    int downloadedData = 0;  // the number of data that has been downloaded
+    int downloadedVirus = 0;  // the number of virus that has been downloded
+    int numAbility = 5; // the number of Abilities that has not been used
   public:
-    Player(int playerNumber);
+    vector<shared_ptr<Link>> links;
+    Player(int playerNumber, string AllLinks);
+    ~Player();
+    int getPlayerNumber() const;
     int getData() const;
     int getViruses() const;
-    void downloadLink(Link &link); // Handle downloading a link
-    void useAbility(int ID); // Use an ability
-    void addLink(const Link& link);
-    void addAbility(const Ability& ability);
+    int getNumAbility() const;
+    void IncreData();
+    void IncreViruses();
+    void DecreAbility();
 };
 
 #endif

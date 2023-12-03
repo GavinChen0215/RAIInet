@@ -6,7 +6,6 @@
 
 class Display {
     std::vector<std::vector<char>> theDisplay;
-    std::unique_ptr<Board> board;
 
   public:
     Display();  // constructor
