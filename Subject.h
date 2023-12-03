@@ -17,8 +17,8 @@ class Subject {
 	void notifyObservers() const;
     virtual ~Subject() = 0;
 	virtual int getCurrent() = 0;
-    virtual bool isWon() = 0;
-	virtual int whoWon() = 0;
+    virtual bool getIsOver() = 0;
+	virtual int getWinner() = 0;
 	virtual std::vector<shared_ptr<Player>> getPlayers() = 0;
 	virtual std::vector<std::vector<Square>> getBoard() = 0;
 };

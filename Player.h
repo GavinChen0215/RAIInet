@@ -22,6 +22,9 @@ class Player {
     void IncreData();
     void IncreViruses();
     void DecreAbility();
+    string playerState();
+    string myViewLinks();
+    string oppoViewLinks();
 };
 
 #endif
