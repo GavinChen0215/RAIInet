@@ -9,6 +9,18 @@ class Square {
     bool isSP = false;  // whether this Square is a Server Port
   public:
     Square (int r, int c);  // ctor to give the position of the Square
+
+    // Accessor
+    int getRow() const;
+    int getCol() const;
+    char getContent() const;
+    bool getLinkOn() const;
+    bool getIsSP() const;
+
+    // Mutator
+    void setContent(char newContent);
+    void toggleLinkOn();
+    void toggleIsSP();
 };
 
 #endif

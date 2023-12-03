@@ -21,3 +21,19 @@ Square::Square(int r, int c): row{r}, col{c} {
         content = '.';  // no Link is placed at this position at initialization
     }
 }
+// Accessor
+int Square::getRow() const { return row; }
+int Square::getRow() const { return row; }
+char Square::getContent() const { return content; }
+bool Square::getLinkOn() const { return linkOn; }
+bool Square::getIsSP() const { return isSP; }
+
+// Mutator
+void Square::setContent(char newContent) { content = newContent; }
+void Square::toggleLinkOn() {
+    linkOn? linkOn = false : linkOn = true;
+}
+void Square::toggleIsSP() {
+    isSP? isSP = false : isSP = true;
+}
+
