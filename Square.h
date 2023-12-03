@@ -3,6 +3,7 @@
 // This class is used to represent each of the square (in total of 64) on the Board
 class Square {
     int row, col;  // position
+    char content;
     bool linkOn = false;  // whether there is a Link placed on this Square
     bool isSP = false;  // whether this Square is a Server Port
   public:
