@@ -3,12 +3,13 @@
 
 using namespace std;
 
-Link::Link(char type, int strength, int r, int c):
-    type{type}, strength{strength}, row{r}, col{c} {}
+Link::Link(char type, char letter, int strength, int owner):
+    type{type}, letter{letter}, strength{strength}, owner{owner} {}
 
-// accessor
+// Accessor
 char Link::getType() const { return type; } 
-char Link::getStrength() const { return strength; }
+char Link::getLetter() const { return letter; }
+int Link::getStrength() const { return strength; }
 int Link::getRow() const { return row; }
 int Link::getCol() const { return col; }
 int Link::getOwner() const { return owner; }
@@ -16,7 +17,7 @@ int Link::getRange() const { return range; }
 bool Link::getState() const { return isDownload; }
 bool Link::getVisibility() const { return visibility; }
 
-// mutator
+// Mutator
 void Link::toggleType() {
     (type == 'D') ? type = 'V' : type = 'D';  // change 'D' to 'V', 'V' to 'D'
 }
@@ -24,7 +25,6 @@ void Link::toggleType() {
 void Link::boostRange() { range = 2; }  // change the range to 2, after using "LinkBoost"
 void Link::setRow(int r) { row = r; }
 void Link::setCol(int c) { col = c; }
-void Link::setOwner(int owner) { owner = owner; }
 void Link::toggleState() {
     isDownload = (isDownload) ? false : true;  // negate the isDownload field
 }
@@ -32,6 +32,8 @@ void Link::toggleVisbility() {
     visibility = (visibility) ? false : true;  // negate the visibility field
 }
 
+// Other
 void Link::battleWith(Link &otherlink) {
     // TO BE FILLED IN...
+    
 }
