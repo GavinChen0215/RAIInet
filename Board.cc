@@ -4,30 +4,23 @@ using namespace std;
 
 Board::Board(): players{Player(0), Player(1)} {}
 
-void Board::updateBoard() {
-    // FILL IN
-}
-void Board::placeLink(const Link& link) {
-    // FILL IN
-}
+int Board::getCurrentPlayer() { return currentPlayer; }
+
+int Board::getBoardSize() { return boardSize; }
+
+int Board::getWinner() { return winner; }
+
+void Board::setWinner(int playerNumber) { winner = playerNumber; }
 
 void Board::moveLink(Link& link, Direction dir){
     // FILL IN
 } 
 
-bool Board::checkGameState(){
+bool Board::isWon(){
     // FILL IN
 }
 
-void Board::handleLinkBattle(Link& attakcer, Link& defender){
-    // FILL IN
-}
-
-Player Board::getPlayer(){
-    // FILL IN
-}
-
-Player Board::getOpponent(){
+void Board::Battle(Link& attakcer, Link& defender){
     // FILL IN
 }
 

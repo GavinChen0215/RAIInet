@@ -3,21 +3,19 @@
 
 using namespace std;
 
-Link::Link(char type, char letter, int strength, int owner):
-    type{type}, letter{letter}, strength{strength}, owner{owner} {}
+Link::Link(char type, int strength, int r, int c):
+    type{type}, strength{strength}, row{r}, col{c} {}
 
-// Accessor
+// accessor
 char Link::getType() const { return type; } 
-char Link::getLetter() const { return letter; }
-int Link::getStrength() const { return strength; }
+char Link::getStrength() const { return strength; }
 int Link::getRow() const { return row; }
 int Link::getCol() const { return col; }
-int Link::getOwner() const { return owner; }
 int Link::getRange() const { return range; }
 bool Link::getState() const { return isDownload; }
 bool Link::getVisibility() const { return visibility; }
 
-// Mutator
+// mutator
 void Link::toggleType() {
     (type == 'D') ? type = 'V' : type = 'D';  // change 'D' to 'V', 'V' to 'D'
 }
@@ -32,8 +30,6 @@ void Link::toggleVisbility() {
     visibility = (visibility) ? false : true;  // negate the visibility field
 }
 
-// Other
 void Link::battleWith(Link &otherlink) {
     // TO BE FILLED IN...
-    
 }

@@ -33,4 +33,3 @@ int Player::getNumAbility() const { return numAbility; }
 void Player::IncreData() { ++downloadedData; }
 void Player::IncreViruses() { ++downloadedVirus; }
 void Player::DecreAbility() { --numAbility; }
-
