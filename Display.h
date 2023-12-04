@@ -3,6 +3,8 @@
 
 #include <vector>
 #include "Board.h"
+#include "Observer.h"
+#include "Subject.h"
 
 class Display : public Observer, public Subject {
     std::vector<std::vector<char>> theDisplay;
@@ -13,7 +15,7 @@ class Display : public Observer, public Subject {
 
   public:
     std::vector<shared_ptr<Player>> players;
-    Display(int playerNumber; std::vector<shared_ptr<Player>> players);
+    Display(int playerNumber, std::vector<shared_ptr<Player>> players);
     void notify(Subject& whichPlayer);
     friend std::ostream &operator<<(std::ostream &out, const Display &display);
 
