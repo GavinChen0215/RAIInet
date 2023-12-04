@@ -65,7 +65,7 @@ int main(int argc, const char* argv[]) {
 
     // Initialization
     Board board(p1Link, p2Link);
-    shared_ptr<Display> display = make_shared<Display>(0, board.players);  // start with player 0
+    shared_ptr<Display> display = make_shared<Display>(1, board.players);  // start with player 1
     
     // ====== START GAME ======
     istream *input = &cin;  // the input source in default to be cin
@@ -82,7 +82,29 @@ int main(int argc, const char* argv[]) {
         } else if (cmd == "board") {  // print the Board
             cout << *display;
         } else if (cmd == "move") {
-            // FILL IN
+            char letter;
+            input >> letter; // which Link to move
+            string direction;
+            input >> direction;
+            Direction dir;
+            if (board.getCurrentPlayer() == 1 && (!(letter >= 'a' && letter <= 'h'))) {
+                cout << "Invalid Link value" << endl;
+                continue;
+            }
+            if (direction == "up") {
+                dir = Direction::UP;
+            } else if (direction == "down") {
+                dir = Direction::DOWN;
+            } else if (direction == "left") {
+                dir = Direction::LEFT;
+            } else if (direction == "right") {
+                dir = Direction::RIGHT;
+            } else {
+                cout << "Invalid Direction" << endl;
+                continue;
+            }
+            board.moveLink(letter, dir);
+            cout << *display;
         } else if (cmd == "ability") {
             // FILL IN
         } else if (cmd == "abilities") {
