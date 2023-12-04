@@ -39,19 +39,23 @@ Display::Display(int playerNumber, vector<shared_ptr<Player>> players): playerNu
     }
 }
 
-void Display::notify(const Subject& whichPlayer) {
-    playerNumber = whichPlayer.getCurrent();
-    winner = whichPlayer.getWinner();
-    isOver = whichPlayer.getIsOver();
-    players = whichPlayer.getPlayers();
-    notifyObservers();
+void Display::updateDisplay(const Board& b) {
+    // Assuming Board provides a method to get its current state as a 2D vector
+    theDisplay.clear();
+    for (const auto& row : b.board) {
+        vector<char> displayRow;
+        for (const auto& square : row) {
+            displayRow.emplace_back(square.getContent());
+        }
+        theDisplay.emplace_back(displayRow);
+    }
+    playerNumber = b.getCurrent();
 }
 
-int Display::getCurrPlayer() const { return playerNumber; }
 
 ostream &operator<<(ostream &out, const Display &display) {
     out << display.players[0]->playerState();
-    int number = display.getCurrPlayer();
+    int number = display.playerNumber;
     if (number == 1) {
         out << display.players[0]->myViewLinks();
     } else {
@@ -72,13 +76,4 @@ ostream &operator<<(ostream &out, const Display &display) {
         out << display.players[1]->myViewLinks();
     }
     return out;
-}
-
-int Display::getCurrent() const { return playerNumber; }
-bool Display::getIsOver() const { return isOver; }
-int Display::getWinner() const { return winner; }
-std::vector<shared_ptr<Player>> Display::getPlayers() const { return players; }
-std::vector<std::vector<Square>> Display::getBoard() const {
-    std::vector<std::vector<Square>> board;
-    return board;
 }

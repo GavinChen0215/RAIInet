@@ -3,28 +3,18 @@
 
 #include <vector>
 #include "Board.h"
-#include "Observer.h"
-#include "Subject.h"
 
-class Display : public Observer, public Subject {
+class Board;
+
+class Display {
     std::vector<std::vector<char>> theDisplay;
     int boardSize = 8;
     int playerNumber;
-    int winner = 0;
-    bool isOver = false;
-
-  public:
     std::vector<shared_ptr<Player>> players;
+  public:
     Display(int playerNumber, std::vector<shared_ptr<Player>> players);
-    int getCurrPlayer() const;
-    void notify(const Subject& whichPlayer) override;
+    void updateDisplay(const Board& b);
     friend std::ostream &operator<<(std::ostream &out, const Display &display);
-
-    int getCurrent() const override;
-    bool getIsOver() const override;
-	  int getWinner() const override;
-	  vector<shared_ptr<Player>> getPlayers() const override;
-    vector<vector<Square>> getBoard() const override;
 };
 
 #endif

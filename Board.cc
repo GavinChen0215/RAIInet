@@ -21,16 +21,12 @@ int Board::getWinner() const { return winner; }
 
 bool Board::getIsOver() const { return isOver; }
 
-vector<shared_ptr<Player>> Board::getPlayers() const { return players; }
-vector<vector<Square>> Board::getBoard() const {return board;}
-
 void Board::setWinner(int playerNumber) { winner = playerNumber; }
 
 void Board::toggleIsOver() { isOver = !isOver; }
 
 void Board::switchPlayer() {
     currentPlayer = (currentPlayer == 2) ? 1 : 2;
-    notifyObservers();
 }
 
 void Board::updateGameState(int playerNumber) {
@@ -45,16 +41,15 @@ void Board::updateGameState(int playerNumber) {
             setWinner(playerNumber - 1);
         }
     }
-    notifyObservers();
 }
 
 void Board::moveLink(char letter, Direction dir){
     int i = (currentPlayer == 1) ? (letter - 'a') : (letter - 'A');
     auto lp = players[currentPlayer - 1]->links[i];
-    /*if (lp->getState()) {
+    if (lp->getState()) {
         cout << "The link is downloaded" << endl;
         return;
-    }*/
+    }
     int row = lp->getRow();
     int col = lp->getCol();
     int newRow = row;
@@ -104,6 +99,8 @@ bool Board::battle(char letter1, char letter2) {
         j = letter2 - 'a';
     }
     int index = (currentPlayer == 1) ? 0 : 1;
+    players[index]->links[i]->toggleVisbility();
+    players[1 - index]->links[j]->toggleVisbility();
     int strength1 = players[index]->links[i]->getStrength();
     int strength2 = players[1 - index]->links[j]->getStrength();
     if (strength1 >= strength2) {
@@ -125,8 +122,8 @@ void Board::downloadLink(char letter) {
         index = letter - 'a';
         i = 1;
     }
-    players[i]->links[index]->downloaded();
-    if (players[i]->links[index]->getType() == 'D') {
+    players[1 - i]->links[index]->downloaded();
+    if (players[1 - i]->links[index]->getType() == 'D') {
         players[i]->IncreData();
     } else {
         players[i]->IncreViruses();

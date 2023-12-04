@@ -29,7 +29,7 @@ void Link::toggleState() {
     isDownload = (isDownload) ? false : true;  // negate the isDownload field
 }
 void Link::toggleVisbility() {
-    visibility = false;
+    visibility = true;
 }
 
 void Link::downloaded() {

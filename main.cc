@@ -87,7 +87,8 @@ int main(int argc, const char* argv[]) {
             string direction;
             *input >> direction;
             Direction dir;
-            if (board.getCurrent() == 1 && (!(letter >= 'a' && letter <= 'h'))) {
+            if ((board.getCurrent() == 1 && (!(letter >= 'a' && letter <= 'h'))) || 
+            (board.getCurrent() == 2 && (!(letter >= 'A' && letter <= 'H')))) {
                 cout << "Invalid Link value" << endl;
                 continue;
             }
@@ -104,7 +105,12 @@ int main(int argc, const char* argv[]) {
                 continue;
             }
             board.moveLink(letter, dir);
+            display->updateDisplay(board);
             cout << *display;
+            if (board.getIsOver()) {
+                cout << "Player " << board.getWinner() << " Won!" << endl;
+                break;
+            }
         } else if (cmd == "ability") {
             // FILL IN
         } else if (cmd == "abilities") {
