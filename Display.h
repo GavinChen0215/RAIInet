@@ -16,14 +16,15 @@ class Display : public Observer, public Subject {
   public:
     std::vector<shared_ptr<Player>> players;
     Display(int playerNumber, std::vector<shared_ptr<Player>> players);
-    void notify(Subject& whichPlayer);
+    int getCurrPlayer() const;
+    void notify(const Subject& whichPlayer) override;
     friend std::ostream &operator<<(std::ostream &out, const Display &display);
 
-    int getCurrent() override;
-    bool getIsOver() override;
-	  int getWinner() override;
-	  std::vector<shared_ptr<Player>> getPlayers() override;
-	  std::vector<std::vector<Square>> getBoard() override;
+    int getCurrent() const override;
+    bool getIsOver() const override;
+	  int getWinner() const override;
+	  vector<shared_ptr<Player>> getPlayers() const override;
+    vector<vector<Square>> getBoard() const override;
 };
 
 #endif

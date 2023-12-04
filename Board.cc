@@ -15,13 +15,14 @@ Board::Board(string links1, string links2) {
     players.emplace_back(make_shared<Player>(2, links2));
 }
 
-int Board::getCurrentPlayer() { return currentPlayer; }
+int Board::getCurrent() const { return currentPlayer; }
 
-int Board::getBoardSize() { return boardSize; }
+int Board::getWinner() const { return winner; }
 
-int Board::getWinner() { return winner; }
+bool Board::getIsOver() const { return isOver; }
 
-bool Board::getIsOver() { return isOver; }
+vector<shared_ptr<Player>> Board::getPlayers() const { return players; }
+vector<vector<Square>> Board::getBoard() const {return board;}
 
 void Board::setWinner(int playerNumber) { winner = playerNumber; }
 
@@ -33,10 +34,10 @@ void Board::switchPlayer() {
 }
 
 void Board::updateGameState(int playerNumber) {
-    if (players[playerNumber - 1]->downloadedData == 4) {
+    if (players[playerNumber - 1]->getData() == 4) {
         toggleIsOver();
         setWinner(playerNumber);
-    } else if (players[playerNumber - 1]->downloadedVirus == 4) {
+    } else if (players[playerNumber - 1]->getViruses() == 4) {
         toggleIsOver();
         if (playerNumber == 1) {
             setWinner(playerNumber + 1);
@@ -50,43 +51,43 @@ void Board::updateGameState(int playerNumber) {
 void Board::moveLink(char letter, Direction dir){
     int i = (currentPlayer == 1) ? (letter - 'a') : (letter - 'A');
     auto lp = players[currentPlayer - 1]->links[i];
-    if (lp->getState()) {
+    /*if (lp->getState()) {
         cout << "The link is downloaded" << endl;
-        continue;
-    }
+        return;
+    }*/
     int row = lp->getRow();
     int col = lp->getCol();
     int newRow = row;
     int newCol = col;
 
     switch (dir) {
-        case UP:    newRow -= link.getRange(); break;
-        case DOWN:  newRow += link.getRange(); break;
-        case LEFT:  newCol -= link.getRange(); break;
-        case RIGHT: newCol += link.getRange(); break;
+        case UP:    newRow -= lp->getRange(); break;
+        case DOWN:  newRow += lp->getRange(); break;
+        case LEFT:  newCol -= lp->getRange(); break;
+        case RIGHT: newCol += lp->getRange(); break;
     }
-    if ((newRow == 0) || (newRow == 7) && (newCol == 3 || newCol == 4)) {
+    if ((newRow == 0 || newRow == 7) && (newCol == 3 || newCol == 4)) {
         if ((currentPlayer == 1 && newRow == 7) || (currentPlayer == 2 && newRow == 0)) {
             downloadLink(letter);
         } else {
             cout << "You cannot move your link to you server spot" << endl;
-            continue;
+            return;
         }
     } else if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
-        if (!(board[newRow][newCol]->getLinkOn())) {
-            board[newRow][newCol]->toggleLinkOn();
-            board[newRow][newCol]->setContent(letter);
+        if (!(board[newRow][newCol].getLinkOn())) {
+            board[newRow][newCol].toggleLinkOn();
+            board[newRow][newCol].setContent(letter);
         } else {
-            if(battle(letter, board[newRow][newCol]->getContent())) {
-                board[newRow][newCol]->setContent(letter);
+            if(battle(letter, board[newRow][newCol].getContent())) {
+                board[newRow][newCol].setContent(letter);
             }
         }
     } else {
         cout << "Move out of bounds" << endl;
-        continue;
+        return;
     }
-    board[row][col]->setContent('.');
-    board[row][col]->toggleLinkOn();
+    board[row][col].setContent('.');
+    board[row][col].toggleLinkOn();
     lp->setRow(newRow);
     lp->setCol(newCol);
     switchPlayer();
@@ -124,8 +125,8 @@ void Board::downloadLink(char letter) {
         index = letter - 'a';
         i = 1;
     }
-    players[i].links[index]->downloaded();
-    if (players[i].links[index]->getType() == 'D') {
+    players[i]->links[index]->downloaded();
+    if (players[i]->links[index]->getType() == 'D') {
         players[i]->IncreData();
     } else {
         players[i]->IncreViruses();

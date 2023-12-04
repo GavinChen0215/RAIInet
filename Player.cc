@@ -24,8 +24,11 @@ Player::Player(int playerNumber, string AllLinks): playerNumber{playerNumber} {
             }
         }
         ++i;
+        letter += 1;
     }
 }
+
+Player::~Player() {}
 
 int Player::getPlayerNumber() const { return playerNumber; }
 int Player::getData() const { return downloadedData; }
@@ -87,5 +90,5 @@ string Player::oppoViewLinks() {
         letter1 += 1;
         letter2 += 1;
     }
-    return oss1.str() + oss2.srt();
+    return oss1.str() + oss2.str();
 }

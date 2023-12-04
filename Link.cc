@@ -36,9 +36,3 @@ void Link::downloaded() {
     toggleState();
     toggleVisbility();
 }
-
-// Other
-void Link::battleWith(Link &otherlink) {
-    // TO BE FILLED IN...
-    
-}

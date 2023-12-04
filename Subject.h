@@ -16,11 +16,11 @@ class Subject {
 	void detachObserver(std::shared_ptr<Observer> ob);
 	void notifyObservers() const;
     virtual ~Subject() = 0;
-	virtual int getCurrent() = 0;
-    virtual bool getIsOver() = 0;
-	virtual int getWinner() = 0;
-	virtual std::vector<shared_ptr<Player>> getPlayers() = 0;
-	virtual std::vector<std::vector<Square>> getBoard() = 0;
+	virtual int getCurrent() const = 0;
+    virtual bool getIsOver() const = 0;
+	virtual int getWinner() const = 0;
+	virtual std::vector<shared_ptr<Player>> getPlayers() const = 0;
+	virtual std::vector<std::vector<Square>> getBoard() const = 0;
 };
 
 #endif

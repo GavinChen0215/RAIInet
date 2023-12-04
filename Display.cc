@@ -11,22 +11,22 @@ Display::Display(int playerNumber, vector<shared_ptr<Player>> players): playerNu
     for (int i = 0; i < boardSize; ++i) {
         vector<char> row;
         for (int j = 0; j < boardSize; ++j) {
-            if ((j == 3 || j == 4) && (i == 0 || i = 7)) {
+            if ((j == 3 || j == 4) && (i == 0 || i == 7)) {
                 row.emplace_back('S');
                 continue;
             }
             bool empty = true;
             int n = 0;
             for (int k = 0; k < 8; ++k) {
-                int r = players[n]->getRow();
-                int c = players[n]->getCol();
+                int r = players[n]->links[k]->getRow();
+                int c = players[n]->links[k]->getCol();
                 if ((r == i) && (c == j)) {
                     empty = !empty;
                     char letter = players[n]->links[k]->getLetter();
                     row.emplace_back(letter);
                     break;
                 }
-                if (k == 7 && n = 0) {
+                if (k == 7 && n == 0) {
                     k = -1;
                     n = 1;
                 }
@@ -39,7 +39,7 @@ Display::Display(int playerNumber, vector<shared_ptr<Player>> players): playerNu
     }
 }
 
-void Display::notify(Subject &whichPlayer) {
+void Display::notify(const Subject& whichPlayer) {
     playerNumber = whichPlayer.getCurrent();
     winner = whichPlayer.getWinner();
     isOver = whichPlayer.getIsOver();
@@ -47,9 +47,12 @@ void Display::notify(Subject &whichPlayer) {
     notifyObservers();
 }
 
+int Display::getCurrPlayer() const { return playerNumber; }
+
 ostream &operator<<(ostream &out, const Display &display) {
     out << display.players[0]->playerState();
-    if (playerNumber == 1) {
+    int number = display.getCurrPlayer();
+    if (number == 1) {
         out << display.players[0]->myViewLinks();
     } else {
         out << display.players[0]->oppoViewLinks();
@@ -63,15 +66,19 @@ ostream &operator<<(ostream &out, const Display &display) {
     }
 	out << "========" << endl;
     out << display.players[1]->playerState();
-    if (playerNumber == 1) {
+    if (number == 1) {
         out << display.players[1]->oppoViewLinks();
     } else {
         out << display.players[1]->myViewLinks();
     }
+    return out;
 }
 
-int getCurrent() { return playerNumber; }
-bool getIsOver() { return isOver; }
-int getWinner() {return Winner; }
-std::vector<shared_ptr<Player>> getPlayers() { return players; }
-std::vector<std::vector<Square>> getBoard() {}
+int Display::getCurrent() const { return playerNumber; }
+bool Display::getIsOver() const { return isOver; }
+int Display::getWinner() const { return winner; }
+std::vector<shared_ptr<Player>> Display::getPlayers() const { return players; }
+std::vector<std::vector<Square>> Display::getBoard() const {
+    std::vector<std::vector<Square>> board;
+    return board;
+}

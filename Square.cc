@@ -23,7 +23,6 @@ Square::Square(int r, int c): row{r}, col{c} {
 }
 // Accessor
 int Square::getRow() const { return row; }
-int Square::getRow() const { return row; }
 char Square::getContent() const { return content; }
 bool Square::getLinkOn() const { return linkOn; }
 bool Square::getIsSP() const { return isSP; }

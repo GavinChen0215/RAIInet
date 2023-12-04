@@ -1,5 +1,5 @@
 #ifndef __LINK_H__
-#define __LINK_H
+#define __LINK_H__
 #include <iostream>
 #include <vector>
 
@@ -37,9 +37,6 @@ class Link {
     void toggleState();
     void toggleVisbility();
     void downloaded();
-
-    // Other methods
-    void battleWith(Link &otherLink);  // method for the purpose of 'battle' between Links
 };
 
 #endif

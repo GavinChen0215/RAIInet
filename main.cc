@@ -64,7 +64,7 @@ int main(int argc, const char* argv[]) {
 
 
     // Initialization
-    Board board(p1Link, p2Link);
+    Board board{p1Link, p2Link};
     shared_ptr<Display> display = make_shared<Display>(1, board.players);  // start with player 1
     
     // ====== START GAME ======
@@ -83,11 +83,11 @@ int main(int argc, const char* argv[]) {
             cout << *display;
         } else if (cmd == "move") {
             char letter;
-            input >> letter; // which Link to move
+            *input >> letter; // which Link to move
             string direction;
-            input >> direction;
+            *input >> direction;
             Direction dir;
-            if (board.getCurrentPlayer() == 1 && (!(letter >= 'a' && letter <= 'h'))) {
+            if (board.getCurrent() == 1 && (!(letter >= 'a' && letter <= 'h'))) {
                 cout << "Invalid Link value" << endl;
                 continue;
             }

@@ -5,8 +5,8 @@ class Subject;
 
 class Observer {
   public:
-    virtual void notify(Subject& whichPlayer) = 0;
-	virtual ~Observer() = default;
+    virtual void notify(const Subject& whichPlayer) = 0;
+	  virtual ~Observer() = default;
 };
 
 #endif
