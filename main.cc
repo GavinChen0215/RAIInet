@@ -108,7 +108,7 @@ int main(int argc, const char* argv[]) {
             display->updateDisplay(board);
             cout << *display;
             if (board.getIsOver()) {
-                cout << "Player " << board.getWinner() << " Won!" << endl;
+                cout << "Player " << board.getWinner() << "Won!" << endl;
                 break;
             }
         } else if (cmd == "ability") {
