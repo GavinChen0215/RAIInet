@@ -36,6 +36,7 @@ class Link {
     void setCol(int c);
     void toggleState();
     void toggleVisbility();
+    void downloaded();
 
     // Other methods
     void battleWith(Link &otherLink);  // method for the purpose of 'battle' between Links

@@ -20,7 +20,6 @@ class Square {
     // Mutator
     void setContent(char newContent);
     void toggleLinkOn();
-    void toggleIsSP();
 };
 
 #endif

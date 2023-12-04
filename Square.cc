@@ -33,7 +33,4 @@ void Square::setContent(char newContent) { content = newContent; }
 void Square::toggleLinkOn() {
     linkOn? linkOn = false : linkOn = true;
 }
-void Square::toggleIsSP() {
-    isSP? isSP = false : isSP = true;
-}
 

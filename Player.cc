@@ -35,7 +35,7 @@ void Player::IncreData() { ++downloadedData; }
 void Player::IncreViruses() { ++downloadedVirus; }
 void Player::DecreAbility() { --numAbility; }
 
-string Player::playerInf() {
+string Player::playerState() {
     ostringstream oss;
     oss << "Player " << playerNumber << ':' << endl;
     oss << "Downloaded: " << downloadedData << "D, " << downloadedVirus << 'V' << endl;
