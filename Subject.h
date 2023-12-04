@@ -1,5 +1,5 @@
-#ifndef _SUBJECT_H_
-#define _SUBJECT_H_
+#ifndef __SUBJECT__H__
+#define __SUBJECT__H__
 #include <memory>
 #include <vector>
 #include "Square.h"

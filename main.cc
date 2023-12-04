@@ -80,7 +80,10 @@ int main(int argc, const char* argv[]) {
             input = &cmdFile;
             continue;  // now, the commands used in the game loop are from <filename>, not cin
         } else if (cmd == "board") {  // print the Board
+            cout << "___________________________" << endl;
             cout << *display;
+            cout << "___________________________" << endl;
+            cout << endl;
         } else if (cmd == "move") {
             char letter;
             *input >> letter; // which Link to move
@@ -89,7 +92,8 @@ int main(int argc, const char* argv[]) {
             Direction dir;
             if ((board.getCurrent() == 1 && (!(letter >= 'a' && letter <= 'h'))) || 
             (board.getCurrent() == 2 && (!(letter >= 'A' && letter <= 'H')))) {
-                cout << "Invalid Link value" << endl;
+                cout << "Invalid move! You don't own: " << letter << endl;
+                cout << endl;
                 continue;
             }
             if (direction == "up") {
@@ -102,11 +106,15 @@ int main(int argc, const char* argv[]) {
                 dir = Direction::RIGHT;
             } else {
                 cout << "Invalid Direction" << endl;
+                cout << endl;
                 continue;
             }
             board.moveLink(letter, dir);
             display->updateDisplay(board);
+            cout << "___________________________" << endl;
             cout << *display;
+            cout << "___________________________" << endl;
+            cout << endl;
             if (board.getIsOver()) {
                 cout << "Player " << board.getWinner() << " Won!" << endl;
                 break;

@@ -47,7 +47,8 @@ void Board::moveLink(char letter, Direction dir){
     int i = (currentPlayer == 1) ? (letter - 'a') : (letter - 'A');
     auto lp = players[currentPlayer - 1]->links[i];
     if (lp->getState()) {
-        cout << "The link is downloaded" << endl;
+        cout << "The link has been downloaded" << endl;
+        cout << endl;
         return;
     }
     int row = lp->getRow();
@@ -61,24 +62,35 @@ void Board::moveLink(char letter, Direction dir){
         case LEFT:  newCol -= lp->getRange(); break;
         case RIGHT: newCol += lp->getRange(); break;
     }
-    if ((newRow == 0 || newRow == 7) && (newCol == 3 || newCol == 4)) {
+    if ((newRow == 0 || newRow == 7) && (newCol == 3 || newCol == 4)) {  // move on to server port
         if ((currentPlayer == 1 && newRow == 7) || (currentPlayer == 2 && newRow == 0)) {
             downloadLink(letter);
         } else {
-            cout << "You cannot move your link to you server spot" << endl;
+            cout << "You cannot move your link on top of your own server ports" << endl;
             return;
         }
-    } else if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {
-        if (!(board[newRow][newCol].getLinkOn())) {
+    } else if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {  
+        if (!(board[newRow][newCol].getLinkOn())) {   // move onto an empty square
             board[newRow][newCol].toggleLinkOn();
             board[newRow][newCol].setContent(letter);
-        } else {
-            if(battle(letter, board[newRow][newCol].getContent())) {
-                board[newRow][newCol].setContent(letter);
+        } else if (board[newRow][newCol].getLinkOn()) {  // move onto a square where there is already a Link
+            char otherLetter = board[newRow][newCol].getContent();
+            if (currentPlayer == 1 && (otherLetter >= 'a' && otherLetter <= 'h')) {
+                cout << "You cannot move a link on top of another link owned by yourself" << endl;
+                return;
+            } else if (currentPlayer == 2 && (otherLetter >= 'A' && otherLetter <= 'H')) {
+                cout << "You cannot move a link on top of another link owned by yourself" << endl;
+                return;
+            } else {  // [A~H] moves ontop of [a~h], battle
+                if(battle(letter, otherLetter)) {
+                    board[newRow][newCol].setContent(letter);
+                }
             }
         }
-    } else {
-        cout << "Move out of bounds" << endl;
+    } else if ((newRow >= 8 && currentPlayer == 1) || (newRow <= -1 && currentPlayer == 2)) {  // move off from opponent's egde
+        downloadLink(letter);
+    } else {  // move off from other egdes => i.e. invalid move
+        cout << "Invalid move! Out of boundary" << endl;
         return;
     }
     board[row][col].setContent('.');

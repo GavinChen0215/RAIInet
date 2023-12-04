@@ -1,5 +1,5 @@
-#ifndef _OBSERVER_H_
-#define _OBSERVER_H_
+#ifndef __OBSERVER__H__
+#define __OBSERVER__H__
 
 class Subject;
 
