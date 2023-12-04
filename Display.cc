@@ -7,7 +7,7 @@
 
 using namespace std;
 
-Display::Display(int playerNumber; vector<shared_ptr<Player>> players): playerNumber{playerNumber}, players{players} {
+Display::Display(int playerNumber, vector<shared_ptr<Player>> players): playerNumber{playerNumber}, players{players} {
     for (int i = 0; i < boardSize; ++i) {
         vector<char> row;
         for (int j = 0; j < boardSize; ++j) {
