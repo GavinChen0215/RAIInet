@@ -52,6 +52,34 @@ void Display::updateDisplay(const Board& b) {
     playerNumber = b.getCurrent();
 }
 
+string Display::convert(AbilityName name) {
+    if (name == LinkBoost) return "LinkBoost";
+    else if (name == Firewall) return "Firewall";
+    else if (name == Download) return "Download";
+    else if (name == Polarize) return "Polarize";
+    else return "Scan";
+}
+
+void Display::printAbilities(int playerNumber) {
+    cout << "              Player " << playerNumber << endl;
+    cout << "----------- ABILITY CARD ------------" << endl;
+    for (int i = 0; i < 5; ++i) {
+        bool isUsed = players[playerNumber - 1]->abilities[i]->getIsUsed();
+        string use;
+        AbilityName abName = players[playerNumber - 1]->abilities[i]->getName();
+        (isUsed)? use = "Yes" : use = "No";
+        if (abName == Scan) {
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"       Used: "<<use<<endl; // just to make it align => looks better
+        } else if (abName == LinkBoost) {
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"  Used: "<<use<<endl; // just to make it align => looks better
+        } else {
+            cout << "ID: " << i + 1 <<
+            "   Name: " << convert(abName) <<
+            "   Used: " << use << endl;
+        }
+    }
+    cout << "-------------------------------------" << endl;
+}
 
 ostream &operator<<(ostream &out, const Display &display) {
     out << display.players[0]->playerState();

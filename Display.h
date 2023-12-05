@@ -14,6 +14,8 @@ class Display {
   public:
     Display(int playerNumber, std::vector<shared_ptr<Player>> players);
     void updateDisplay(const Board& b);
+    string convert(AbilityName name);
+    void printAbilities(int playerNumber);
     friend std::ostream &operator<<(std::ostream &out, const Display &display);
 };
 
