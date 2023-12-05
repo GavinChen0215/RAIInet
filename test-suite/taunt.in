@@ -1,0 +1,7 @@
+ability 2 6 5
+move g down
+ability 2 1 5
+move F up
+ability 1 a F
+move a down
+move b down

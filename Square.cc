@@ -28,6 +28,7 @@ char Square::getFwContent() const { return fwContent; }
 bool Square::getLinkOn() const { return linkOn; }
 bool Square::getIsSP() const { return isSP; }
 bool Square::getIsFW() const { return isFW; }
+int Square::getFwOnwer() const { return fwOwner; }
 
 // Mutator
 void Square::setContent(char newContent) { content = newContent; }
@@ -38,3 +39,5 @@ void Square::toggleIsFW() {
     isFW? isFW = false : isFW = true;
 }
 void Square::setFwContent(char newFW) { fwContent = newFW; }
+
+void Square::setFwOwner(int owner) { fwOwner = owner; }

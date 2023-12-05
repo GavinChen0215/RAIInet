@@ -160,7 +160,7 @@ int main(int argc, const char* argv[]) {
             cout << endl;
             abilityLeft = 1;  // switch turn, reset
             if (board.getIsOver()) {
-                cout << "Player " << board.getWinner() << "Won!" << endl;
+                cout << "Congratulations! Player " << board.getWinner() << " Won!" << endl;
                 break;
             }
         } else if (cmd == "ability") {

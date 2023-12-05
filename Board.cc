@@ -73,13 +73,24 @@ void Board::moveLink(char letter, Direction dir){
         char otherLetter = board[newRow][newCol].getContent();
         bool isLinkOn = board[newRow][newCol].getLinkOn();
         if (board[newRow][newCol].getIsFW()) {  // move onto a Firewall
+            // And another Link owned by oneself is already stationed in that Firewall
+            if (isLinkOn) {
+                if (currentPlayer == 1 && (otherLetter >= 'a' && otherLetter <= 'h')) {
+                    cout << "You cannot move a link on top of another link owned by yourself" << endl;
+                    return;
+                } else if (currentPlayer == 2 && (otherLetter >= 'A' && otherLetter <= 'H')) {
+                    cout << "You cannot move a link on top of another link owned by yourself" << endl;
+                    return;
+                }
+            }
             // (p1 OR p2)-Link moves onto his/her/their/its/other's own Firewall nothing happens
-            if ((currentPlayer == 1 && otherLetter == 'm') || (currentPlayer == 2 && otherLetter == 'w')) {  
+            int owner = board[newRow][newCol].getFwOnwer();
+            if ((currentPlayer == 1 && owner == 1) || (currentPlayer == 2 && owner == 2)) {  
                 board[newRow][newCol].toggleLinkOn();        
                 board[newRow][newCol].setContent(letter);
             } 
             // p1 Link moves onto p2 Firewall, revealed and downloaded by p1 if it's a Virus-Link
-            else if (currentPlayer == 1 && otherLetter == 'w') {  
+            else if (currentPlayer == 1 && owner == 2) {  
                 if (players[0]->links[letter - 'a']->getType() == 'D') {  // Data-Link
                     board[newRow][newCol].toggleLinkOn();
                     players[0]->links[letter - 'a']->toggleVisbility();   // just reaveal
@@ -89,7 +100,7 @@ void Board::moveLink(char letter, Direction dir){
                 }
             }
             // p2 Link moves onto p1 Firewall
-            else if (currentPlayer == 2 && otherLetter == 'm') {  
+            else if (currentPlayer == 2 && owner == 1) {  
                 if (players[1]->links[letter - 'A']->getType() == 'D') {  // Data-Link
                     board[newRow][newCol].toggleLinkOn();
                     players[1]->links[letter - 'A']->toggleVisbility();   // just reaveal
@@ -370,6 +381,7 @@ bool Board::useAbility(int ID, istream& in) {
                 board[row][col].toggleIsFW();  // indicate the square is a Firewall
                 board[row][col].setContent('m'); // m for player 1's Firewall
                 board[row][col].setFwContent('m');
+                board[row][col].setFwOwner(1);
                 // update
                 players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
                 players[curr - 1]->DecreAbility();
@@ -377,6 +389,7 @@ bool Board::useAbility(int ID, istream& in) {
                 board[row][col].toggleIsFW();
                 board[row][col].setContent('w'); // w for player 2's Firewall
                 board[row][col].setFwContent('w');
+                board[row][col].setFwOwner(2);
                 // update
                 players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
                 players[curr - 1]->DecreAbility();

@@ -8,6 +8,7 @@ class Square {
     char fwContent;
     bool linkOn = false;  // whether there is a Link placed on this Square
     bool isSP = false;  // whether this Square is a Server Port
+    int fwOwner;
     bool isFW = false;
   public:
     Square (int r, int c);  // ctor to give the position of the Square
@@ -20,12 +21,14 @@ class Square {
     bool getLinkOn() const;
     bool getIsSP() const;
     bool getIsFW() const;
+    int getFwOnwer() const;
 
     // Mutator
     void setContent(char newContent);
     void setFwContent(char newFW);
     void toggleLinkOn();
     void toggleIsFW();
+    void setFwOwner(int owner);
 };
 
 #endif
