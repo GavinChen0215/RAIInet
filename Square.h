@@ -4,9 +4,11 @@
 // This class is used to represent each of the square (in total of 64) on the Board
 class Square {
     int row, col;  // position
-    char content;  // A~H, a~h, or a dot '.'
+    char content;  // <A~H>, <a~h>, <.>, <m or w> 
+    char fwContent;
     bool linkOn = false;  // whether there is a Link placed on this Square
     bool isSP = false;  // whether this Square is a Server Port
+    bool isFW = false;
   public:
     Square (int r, int c);  // ctor to give the position of the Square
 
@@ -14,14 +16,16 @@ class Square {
     int getRow() const;
     int getCol() const;
     char getContent() const;
+    char getFwContent() const;
     bool getLinkOn() const;
     bool getIsSP() const;
+    bool getIsFW() const;
 
     // Mutator
     void setContent(char newContent);
+    void setFwContent(char newFW);
     void toggleLinkOn();
-
-    bool operator!=(const Square& other) const;
+    void toggleIsFW();
 };
 
 #endif

@@ -37,6 +37,7 @@ class Board {
     void moveLink(char letter, Direction dir);  // Move a link on the board
     bool battle(char letter1, char letter2);
     void downloadLink(char letter);
+    void ownDownload(char letter);
     bool useAbility(int ID, istream& in); // return whether used an Ability successfully or not
 };
 

@@ -69,12 +69,39 @@ void Board::moveLink(char letter, Direction dir){
             cout << "You cannot move your link on top of your own server ports" << endl;
             return;
         }
-    } else if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {  
-        if (!(board[newRow][newCol].getLinkOn())) {   // move onto an empty square
+    } else if (newRow >= 0 && newRow < boardSize && newCol >= 0 && newCol < boardSize) {  // valid move
+        char otherLetter = board[newRow][newCol].getContent();
+        bool isLinkOn = board[newRow][newCol].getLinkOn();
+        if (board[newRow][newCol].getIsFW()) {  // move onto a Firewall
+            // (p1 OR p2)-Link moves onto his/her/their/its/other's own Firewall nothing happens
+            if ((currentPlayer == 1 && otherLetter == 'm') || (currentPlayer == 2 && otherLetter == 'w')) {  
+                board[newRow][newCol].toggleLinkOn();        
+                board[newRow][newCol].setContent(letter);
+            } 
+            // p1 Link moves onto p2 Firewall, revealed and downloaded by p1 if it's a Virus-Link
+            else if (currentPlayer == 1 && otherLetter == 'w') {  
+                if (players[0]->links[letter - 'a']->getType() == 'D') {  // Data-Link
+                    board[newRow][newCol].toggleLinkOn();
+                    players[0]->links[letter - 'a']->toggleVisbility();   // just reaveal
+                    board[newRow][newCol].setContent(letter);
+                } else {  // Virus-Link
+                    ownDownload(letter);  // reveal and download (download means it is revealed as well)
+                }
+            }
+            // p2 Link moves onto p1 Firewall
+            else if (currentPlayer == 2 && otherLetter == 'm') {  
+                if (players[1]->links[letter - 'A']->getType() == 'D') {  // Data-Link
+                    board[newRow][newCol].toggleLinkOn();
+                    players[1]->links[letter - 'A']->toggleVisbility();   // just reaveal
+                    board[newRow][newCol].setContent(letter);
+                } else {  // Virus-Link
+                    ownDownload(letter);  // reveal and download (download means it is revealed as well)
+                }
+            }
+        } else if (!isLinkOn) {  // move onto an empty square
             board[newRow][newCol].toggleLinkOn();
             board[newRow][newCol].setContent(letter);
-        } else if (board[newRow][newCol].getLinkOn()) {  // move onto a square where there is already a Link
-            char otherLetter = board[newRow][newCol].getContent();
+        } else if (isLinkOn) {  // move onto a square where there is already a Link
             if (currentPlayer == 1 && (otherLetter >= 'a' && otherLetter <= 'h')) {
                 cout << "You cannot move a link on top of another link owned by yourself" << endl;
                 return;
@@ -88,13 +115,19 @@ void Board::moveLink(char letter, Direction dir){
             }
         }
     } else if ((newRow >= 8 && currentPlayer == 1) || (newRow <= -1 && currentPlayer == 2)) {  // move off from opponent's egde
-        downloadLink(letter);
+        ownDownload(letter);
     } else {  // move off from other egdes => i.e. invalid move
         cout << "Invalid move! Out of boundary" << endl;
         return;
     }
-    board[row][col].setContent('.');
-    board[row][col].toggleLinkOn();
+
+    if (board[row][col].getIsFW()) {
+        board[row][col].setContent(board[row][col].getFwContent());
+        board[row][col].toggleLinkOn();
+    } else {
+        board[row][col].setContent('.');
+        board[row][col].toggleLinkOn();
+    }
     lp->setRow(newRow);
     lp->setCol(newCol);
     switchPlayer();
@@ -143,7 +176,31 @@ void Board::downloadLink(char letter) {
     updateGameState(i + 1);
 }
 
+void Board::ownDownload(char letter) {
+    int index;
+    int i;
+    if (letter >= 'A' && letter <= 'H') {
+        index = letter - 'A';
+        i = 1;
+    } else {
+        index = letter - 'a';
+        i = 0;
+    }
+    players[i]->links[index]->downloaded();
+    if (players[i]->links[index]->getType() == 'D') {
+        players[i]->IncreData();
+    } else {
+        players[i]->IncreViruses();
+    }
+    updateGameState(i + 1);
+}
+
+
 bool Board::useAbility(int ID, istream& in) {
+    if (ID < 1 || ID > 5) {
+        cout << "Invalid Ability ID: Please enter a number between 1 and 5" << endl;
+        return false;
+    }
     int curr = getCurrent();
     if (players[curr - 1]->abilities[ID - 1]->getIsUsed()) {
         cout << "Invalid Ability: This Ability has been used... QwQ" << endl;
@@ -195,8 +252,12 @@ bool Board::useAbility(int ID, istream& in) {
                 auto theLink = players[1]->links[oppoLink - 'A'];
                 int row = theLink->getRow();
                 int col = theLink->getCol();
-                theLink->toggleVisbility(); // don't need to reveal the Link downloaded using this Ability
-                downloadLink(oppoLink);
+                if (players[1]->links[oppoLink - 'A']->getVisibility()) {
+                    downloadLink(oppoLink);
+                } else {
+                    downloadLink(oppoLink);
+                    players[1]->links[oppoLink - 'A']->setVisFalse();
+                }
                 // update
                 board[row][col].setContent('.');
                 board[row][col].toggleLinkOn();
@@ -210,9 +271,14 @@ bool Board::useAbility(int ID, istream& in) {
                 auto theLink = players[0]->links[oppoLink - 'a'];
                 int row = theLink->getRow();
                 int col = theLink->getCol();
-                downloadLink(oppoLink);
+
+                if (players[0]->links[oppoLink - 'a']->getVisibility()) {
+                    downloadLink(oppoLink);
+                } else {
+                    downloadLink(oppoLink);
+                    players[0]->links[oppoLink - 'a']->setVisFalse();
+                }
                 // update
-                players[0]->links[oppoLink - 'a']->toggleVisbility();
                 board[row][col].setContent('.');
                 board[row][col].toggleLinkOn();
                 players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
@@ -293,9 +359,154 @@ bool Board::useAbility(int ID, istream& in) {
 
     // Firewall
     else if (abName == AbilityName::Firewall) {
-        char linkLetter;
         int row, col;
+        if (in >> row && in >> col) {
+            // first check is the square at (row,col) is empty or not
+            if (board[row][col].getLinkOn()) {
+                cout << "This square is currently occupied by a Link" << endl;
+                return false;
+            } 
+            if (curr == 1) {
+                board[row][col].toggleIsFW();  // indicate the square is a Firewall
+                board[row][col].setContent('m'); // m for player 1's Firewall
+                board[row][col].setFwContent('m');
+                // update
+                players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                players[curr - 1]->DecreAbility();
+            } else if (curr == 2) {
+                board[row][col].toggleIsFW();
+                board[row][col].setContent('w'); // w for player 2's Firewall
+                board[row][col].setFwContent('w');
+                // update
+                players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                players[curr - 1]->DecreAbility();
+            } 
+        }
+    } 
+
+    // BoostStrength
+    else if (abName == AbilityName::BoostStrength) {
+        char linkLetter;
+        if (in >> linkLetter) {
+            // check if the Link belongs to the Player who used BoostStrength
+            if (linkLetter >= 'a' && linkLetter <= 'h' && curr == 1) {
+                // check if the Link represented by <linkLetter> still exists
+                if (players[curr - 1]->links[linkLetter - 'a']->getState()) {
+                    cout << "Invalid Link: This Link has been downloaded" << endl;
+                    return false;
+                } else {
+                    // use ability
+                    players[curr - 1]->links[linkLetter - 'a']->incStrength();
+                    // update info
+                    players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                    players[curr - 1]->DecreAbility();
+                }
+            } else if (linkLetter >= 'A' && linkLetter <= 'H' && curr == 2) {
+                if (players[curr - 1]->links[linkLetter - 'A']->getState()) {
+                    cout << "Invalid Link: This Link has been downloaded" << endl;
+                    return false;
+                } else {
+                    players[curr - 1]->links[linkLetter - 'A']->incStrength();
+                    players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                    players[curr - 1]->DecreAbility();
+                }
+            }
+        }
     }
 
+    // ExchangeLocation
+    else if (abName == AbilityName::ExchangeLocation) {
+        char link1, link2;
+        if (in >> link1 && in >> link2) {
+            // check if the two Links belongs to the Player who used ExchangeLocation
+            if (curr == 1 && link1 >= 'a' && link1 <= 'h' && link2 >= 'a' && link2 <= 'h') {
+                if (players[curr - 1]->links[link1 - 'a']->getState() || players[curr - 1]->links[link2 - 'a']->getState()) {
+                    cout << "Invalid Links: Some of the Links have been downloaded" << endl;
+                    return false;
+                } else {
+
+                    int tempRow1 = players[curr - 1]->links[link1 - 'a']->getRow();
+                    int tempCol1 = players[curr - 1]->links[link1 - 'a']->getCol();
+                    int tempRow2 = players[curr - 1]->links[link2 - 'a']->getRow();
+                    int tempCol2 = players[curr - 1]->links[link2 - 'a']->getCol();
+                    board[tempRow2][tempCol2].setContent(link1);
+                    board[tempRow1][tempCol1].setContent(link2);
+                    // // exchange
+                    players[curr - 1]->links[link1 - 'a']->setRow(tempRow2);
+                    players[curr - 1]->links[link1 - 'a']->setCol(tempCol2);
+                    players[curr - 1]->links[link2 - 'a']->setRow(tempRow1);
+                    players[curr - 1]->links[link2 - 'a']->setCol(tempCol1);
+
+                    // update
+                    players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                    players[curr - 1]->DecreAbility();
+                }
+            } else if (curr == 2 && link1 >= 'A' && link1 <= 'H' && link2 >= 'A' && link2 <= 'H') {
+                if (players[curr - 1]->links[link1 - 'A']->getState() || players[curr - 1]->links[link2 - 'A']->getState()) {
+                    cout << "Invalid Links: Some of the Links have been downloaded" << endl;
+                    return false;
+                } else {
+                    int tempRow1 = players[curr - 1]->links[link1 - 'A']->getRow();
+                    int tempCol1 = players[curr - 1]->links[link1 - 'A']->getCol();
+                    int tempRow2 = players[curr - 1]->links[link2 - 'A']->getRow();
+                    int tempCol2 = players[curr - 1]->links[link2 - 'A']->getCol();
+                    board[tempRow2][tempCol2].setContent(link1);
+                    board[tempRow1][tempCol1].setContent(link2);
+                    players[curr - 1]->links[link1 - 'A']->setRow(tempRow2);
+                    players[curr - 1]->links[link1 - 'A']->setCol(tempCol2);
+                    players[curr - 1]->links[link2 - 'A']->setRow(tempRow1);
+                    players[curr - 1]->links[link2 - 'A']->setCol(tempCol1);
+                    // update
+                    players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                    players[curr - 1]->DecreAbility();
+                }
+            }
+        }
+    }
+
+    // Taunt
+    else if (abName == AbilityName::Taunt) {  // cannot be owned by the same player
+        char link1, link2;
+        if (in >> link1 && in >> link2) {
+            if ((curr == 1 && (link1 < 'a' || link1 > 'h')) || (curr == 2 && (link1 < 'A' || link1 > 'H'))) {
+                cout << "You do not have the link " << link1 << endl;
+                return false;
+            } else if ((curr == 1 && (link2 < 'A' || link2 > 'H')) || (curr == 2 && (link2 < 'a' || link2 > 'h'))) {
+                cout << "Your opponent does not have the link " << link2 << endl;
+                return false;
+            } else {
+                int row;
+                int col;
+                if (battle(link1, link2)) {
+                    if (curr == 1) {
+                        row = players[1]->links[link2 - 'A']->getRow();
+                        col = players[1]->links[link2 - 'A']->getCol();
+                    } else {
+                        row = players[0]->links[link2 - 'a']->getRow();
+                        col = players[0]->links[link2 - 'a']->getCol();
+                    }
+                } else {
+                    if (curr == 1) {
+                        row = players[0]->links[link1 - 'a']->getRow();
+                        col = players[0]->links[link1 - 'a']->getCol();
+                    } else {
+                        row = players[1]->links[link1 - 'A']->getRow();
+                        col = players[1]->links[link1 - 'A']->getCol();
+                    }
+                }
+                board[row][col].setContent('.');
+                board[row][col].toggleLinkOn();
+                players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
+                players[curr - 1]->DecreAbility();
+
+            }
+        }
+    }
+
+    // Invalid Ability Name
+    else {
+        cout << "Unknown Ability" << endl;
+        return false;
+    }
     return true;
 }

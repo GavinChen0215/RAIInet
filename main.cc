@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <vector>
 #include <random>
 #include <chrono>
 #include "Board.h"
@@ -14,7 +15,7 @@ using namespace std;
 
 int main(int argc, const char* argv[]) {
     string p1Link, p2Link;
-    string p1Ab, p2Ab;
+    string p1Ab = "LFDSP", p2Ab = "LFDSP";
     bool graphics = false;
 
     // ===== Randomize the Link that each Player gets =====
@@ -55,12 +56,22 @@ int main(int argc, const char* argv[]) {
             }
             ++i;
         } else if (arg == "-ability1") {
-            p1Ab = argv[i + 1];
+            string temp = argv[i + 1];
+            if (temp.length() != 5) {
+                cout << "Incorrect set up of ability1" << endl;
+                return 1;
+            }
+            p1Ab = temp;
             ++i;
         } else if (arg == "-ability2") {
-            p2Ab = argv[i + 1];
+            string temp = argv[i + 1];
+            if (temp.length() != 5) {
+                cout << "Incorrect set up of ability2" << endl;
+                return 1;
+            }
+            p2Ab = temp;
             ++i;
-        } else if (arg == "graphics") {
+        } else if (arg == "-graphics") {
             graphics = true;
         }
     }
@@ -137,6 +148,7 @@ int main(int argc, const char* argv[]) {
             *input >> abID;
             int successAb = board.useAbility(abID, *input);
             display->updateDisplay(board);
+            cout << *display;
             if (successAb) abilityLeft = 0;
         } else if (cmd == "abilities") {  // display the list of abilities that a Player has
             display->printAbilities(board.getCurrent());
