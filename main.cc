@@ -13,6 +13,16 @@
 
 using namespace std;
 
+bool checkSame(string theStr) {  // helper for setting up abilities
+    for (const char abInitial : theStr) {
+        const int abNum = count(theStr.cbegin(), theStr.cend(), abInitial);
+        if (abNum > 2) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int main(int argc, const char* argv[]) {
     string p1Link, p2Link;
     string p1Ab = "LFDSP", p2Ab = "LFDSP";
@@ -56,20 +66,30 @@ int main(int argc, const char* argv[]) {
             ++i;
         } else if (arg == "-ability1") {
             string temp = argv[i + 1];
-            if (temp.length() != 5) {
-                cout << "Incorrect set up of ability1" << endl;
+            if (!checkSame(temp)) {
+                if (temp.length() != 5) {
+                    cout << "A player may only have up to 5 abilities" << endl;
+                    return 1;
+                }
+                p1Ab = temp;
+                ++i;
+            } else {
+                cout << "A player may have at most 2 of the same ability" << endl;
                 return 1;
             }
-            p1Ab = temp;
-            ++i;
         } else if (arg == "-ability2") {
             string temp = argv[i + 1];
-            if (temp.length() != 5) {
-                cout << "Incorrect set up of ability2" << endl;
+            if (!checkSame(temp)) {
+                if (temp.length() != 5) {
+                    cout << "A player may only have up to 5 abilities" << endl;
+                    return 1;
+                }
+                p2Ab = temp;
+                ++i;
+            } else {
+                cout << "A player may have at most 2 of the same ability" << endl;
                 return 1;
             }
-            p2Ab = temp;
-            ++i;
         } else if (arg == "-graphics") {
             // FILL IN
         }
@@ -85,18 +105,22 @@ int main(int argc, const char* argv[]) {
     istream *input = &cin;  // the input source in default to be cin
     int abilityLeft = 1; // # of ability that a Player can use in each turn
     string cmd;
+    ifstream cmdFile;
+    bool isCin = true;
     cout << "___________________________" << endl;
     cout << *display;
     cout << "___________________________" << endl;
+    cout << "Enter a command: ";
     
     while (*input >> cmd) {
         if (cmd == "quit") break;  // exit the game
         else if (cmd == "sequence") {  // change the input source to <filename>
             string filename;
             cin >> filename;
-            ifstream cmdFile {filename};
+            cmdFile.open(filename);
             input = &cmdFile;
-            continue;  // now, the commands used in the game loop are from <filename>, not cin
+            isCin = false;
+            // now, the commands used in the game loop are from <filename>, not cin
         } else if (cmd == "board") {  // display the Board
             cout << "___________________________" << endl;
             cout << *display;
@@ -147,12 +171,21 @@ int main(int argc, const char* argv[]) {
             *input >> abID;
             int successAb = board.useAbility(abID, *input);
             display->updateDisplay(board);
+            cout << "___________________________" << endl;
             cout << *display;
+            cout << "___________________________" << endl;
+            cout << endl;
             if (successAb) abilityLeft = 0;
         } else if (cmd == "abilities") {  // display the list of abilities that a Player has
             display->printAbilities(board.getCurrent());
         } else {
-            cout << "Invalid Command. Please Try Again: ";
+            string junk;
+            getline(*input, junk);
+            junk.clear();
+            cout << "Invalid Command. Please Try Again." << endl;
+        }
+        if (isCin) {
+            cout << "Enter a command: ";    
         }
     } // while
     return 0;
