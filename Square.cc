@@ -38,4 +38,3 @@ void Square::toggleIsFW() {
     isFW? isFW = false : isFW = true;
 }
 void Square::setFwContent(char newFW) { fwContent = newFW; }
-

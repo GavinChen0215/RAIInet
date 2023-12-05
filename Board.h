@@ -5,7 +5,6 @@
 #include <memory>
 #include "Player.h"
 #include "Square.h"
-#include "Display.h"
 
 
 // used for moving a Link

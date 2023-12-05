@@ -8,7 +8,7 @@
 #include <random>
 #include <chrono>
 #include "Board.h"
-#include "Display.h"
+#include "DisplayBoard.h"
 
 
 using namespace std;
@@ -26,6 +26,7 @@ bool checkSame(string theStr) {  // helper for setting up abilities
 int main(int argc, const char* argv[]) {
     string p1Link, p2Link;
     string p1Ab = "LFDSP", p2Ab = "LFDSP";
+    bool graphics = false;
 
     // ===== Randomize the Link that each Player gets =====
     std::vector<std::string> randomLink = {"V1", "V2", "V3", "V4", "D1", "D2", "D3", "D4"};
@@ -91,7 +92,7 @@ int main(int argc, const char* argv[]) {
                 return 1;
             }
         } else if (arg == "-graphics") {
-            // FILL IN
+            graphics = true;
         }
     }
     // ===== Set Up Ends =====
@@ -99,7 +100,7 @@ int main(int argc, const char* argv[]) {
 
     // Initialization
     Board board{p1Link, p2Link, p1Ab, p2Ab};
-    shared_ptr<Display> display = make_shared<Display>(1, board.players);  // start with player 1
+    shared_ptr<DisplayBoard> display = make_shared<DisplayBoard>(1, graphics, board.players);  // start with player 1
     
     // ====== START GAME ======
     istream *input = &cin;  // the input source in default to be cin
@@ -159,7 +160,7 @@ int main(int argc, const char* argv[]) {
             cout << endl;
             abilityLeft = 1;  // switch turn, reset
             if (board.getIsOver()) {
-                cout << "Player " << board.getWinner() << " Won!" << endl;
+                cout << "Player " << board.getWinner() << "Won!" << endl;
                 break;
             }
         } else if (cmd == "ability") {
