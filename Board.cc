@@ -472,7 +472,11 @@ bool Board::useAbility(int ID, istream& in) {
                     // update
                     players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
                     players[curr - 1]->DecreAbility();
+                    return true;
                 }
+            } else {
+                cout << "You do not own both of: " << link1 << " and " << link2 << endl;
+                return false;
             }
         }
     }
@@ -511,7 +515,7 @@ bool Board::useAbility(int ID, istream& in) {
                 board[row][col].toggleLinkOn();
                 players[curr - 1]->abilities[ID - 1]->toggleIsUsed();
                 players[curr - 1]->DecreAbility();
-
+                return true;
             }
         }
     }

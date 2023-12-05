@@ -10,8 +10,6 @@
 // used for moving a Link
 enum Direction {UP, DOWN, LEFT, RIGHT};
 
-// Idea: Board is the only Subject, and its only Observer will be the TextDisplay,
-//       hence, I am not writing an abstract Subject/Observer class
 class Board {
     int boardSize = 8;
     int currentPlayer = 1;  // Track the current player (p1 or p2), start with player 1

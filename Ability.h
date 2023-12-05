@@ -27,9 +27,6 @@ class Ability {
 
     // Mutator
     void toggleIsUsed();
-
-    // Other
-    std::string convert(AbilityName name);
 };
 
 #endif
