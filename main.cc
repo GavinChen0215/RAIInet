@@ -7,13 +7,15 @@
 #include <random>
 #include <chrono>
 #include "Board.h"
-#include "Display.h"
+#include "DisplayBoard.h"
 
 
 using namespace std;
 
 int main(int argc, const char* argv[]) {
     string p1Link, p2Link;
+    string p1Ab, p2Ab;
+    bool graphics = false;
 
     // ===== Randomize the Link that each Player gets =====
     std::vector<std::string> randomLink = {"V1", "V2", "V3", "V4", "D1", "D2", "D3", "D4"};
@@ -53,23 +55,29 @@ int main(int argc, const char* argv[]) {
             }
             ++i;
         } else if (arg == "-ability1") {
-            // FILL IN
+            p1Ab = argv[i + 1];
+            ++i;
         } else if (arg == "-ability2") {
-            // FILL IN
+            p2Ab = argv[i + 1];
+            ++i;
         } else if (arg == "graphics") {
-            // FILL IN
+            graphics = true;
         }
     }
     // ===== Set Up Ends =====
 
 
     // Initialization
-    Board board{p1Link, p2Link};
-    shared_ptr<Display> display = make_shared<Display>(1, board.players);  // start with player 1
+    Board board{p1Link, p2Link, p1Ab, p2Ab};
+    shared_ptr<DisplayBoard> display = make_shared<DisplayBoard>(1, graphics, board.players);  // start with player 1
     
     // ====== START GAME ======
     istream *input = &cin;  // the input source in default to be cin
+    int abilityLeft = 1; // # of ability that a Player can use in each turn
     string cmd;
+    cout << "___________________________" << endl;
+    cout << *display;
+    cout << "___________________________" << endl;
     
     while (*input >> cmd) {
         if (cmd == "quit") break;  // exit the game
@@ -79,8 +87,11 @@ int main(int argc, const char* argv[]) {
             ifstream cmdFile {filename};
             input = &cmdFile;
             continue;  // now, the commands used in the game loop are from <filename>, not cin
-        } else if (cmd == "board") {  // print the Board
+        } else if (cmd == "board") {  // display the Board
+            cout << "___________________________" << endl;
             cout << *display;
+            cout << "___________________________" << endl;
+            cout << endl;
         } else if (cmd == "move") {
             char letter;
             *input >> letter; // which Link to move
@@ -89,7 +100,8 @@ int main(int argc, const char* argv[]) {
             Direction dir;
             if ((board.getCurrent() == 1 && (!(letter >= 'a' && letter <= 'h'))) || 
             (board.getCurrent() == 2 && (!(letter >= 'A' && letter <= 'H')))) {
-                cout << "Invalid Link value" << endl;
+                cout << "Invalid move! You don't own: " << letter << endl;
+                cout << endl;
                 continue;
             }
             if (direction == "up") {
@@ -102,19 +114,32 @@ int main(int argc, const char* argv[]) {
                 dir = Direction::RIGHT;
             } else {
                 cout << "Invalid Direction" << endl;
+                cout << endl;
                 continue;
             }
             board.moveLink(letter, dir);
             display->updateDisplay(board);
+            cout << "___________________________" << endl;
             cout << *display;
+            cout << "___________________________" << endl;
+            cout << endl;
+            abilityLeft = 1;  // switch turn, reset
             if (board.getIsOver()) {
                 cout << "Player " << board.getWinner() << "Won!" << endl;
                 break;
             }
         } else if (cmd == "ability") {
-            // FILL IN
-        } else if (cmd == "abilities") {
-            // FILL IN
+            if (abilityLeft == 0) {  // already used an ability in the current turn
+                cout << "You have already used an ability in this turn" << endl;
+                continue;
+            }
+            int abID;
+            *input >> abID;
+            int successAb = board.useAbility(abID, *input);
+            display->updateDisplay(board);
+            if (successAb) abilityLeft = 0;
+        } else if (cmd == "abilities") {  // display the list of abilities that a Player has
+            display->printAbilities(board.getCurrent());
         } else {
             cout << "Invalid Command. Please Try Again: ";
         }

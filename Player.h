@@ -5,6 +5,7 @@
 #include <string>
 #include <memory>
 #include "Link.h"
+#include "Ability.h"
 using namespace std;
 
 class Player {
@@ -14,7 +15,8 @@ class Player {
     int numAbility = 5; // the number of Abilities that has not been used
   public:
     vector<shared_ptr<Link>> links;
-    Player(int playerNumber, string AllLinks);
+    vector<shared_ptr<Ability>> abilities;
+    Player(int playerNumber, string AllLinks, string AllAbilities);
     ~Player();
     int getPlayerNumber() const;
     int getData() const;

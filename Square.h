@@ -20,6 +20,8 @@ class Square {
     // Mutator
     void setContent(char newContent);
     void toggleLinkOn();
+
+    bool operator!=(const Square& other) const;
 };
 
 #endif

@@ -33,3 +33,7 @@ void Square::toggleLinkOn() {
     linkOn? linkOn = false : linkOn = true;
 }
 
+bool operator!=(const Square& other) const {
+    return 
+}
+

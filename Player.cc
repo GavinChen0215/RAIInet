@@ -1,7 +1,7 @@
 #include <sstream>
 #include "Player.h"
 
-Player::Player(int playerNumber, string AllLinks): playerNumber{playerNumber} {
+Player::Player(int playerNumber, string AllLinks, string AllAbilities): playerNumber{playerNumber} {
     char letter = (playerNumber == 1) ? 'a' : 'A';
     int n = AllLinks.length();
     int i = 0;
@@ -25,6 +25,10 @@ Player::Player(int playerNumber, string AllLinks): playerNumber{playerNumber} {
         }
         ++i;
         letter += 1;
+    }
+    int abLength = AllAbilities.length();
+    for (int k = 0; k < abLength; ++k) {
+        abilities.emplace_back(make_shared<Ability>(k + 1, AllAbilities[k]));
     }
 }
 

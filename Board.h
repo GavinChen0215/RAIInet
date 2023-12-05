@@ -5,7 +5,6 @@
 #include <memory>
 #include "Player.h"
 #include "Square.h"
-#include "Display.h"
 
 
 // used for moving a Link
@@ -15,7 +14,7 @@ enum Direction {UP, DOWN, LEFT, RIGHT};
 //       hence, I am not writing an abstract Subject/Observer class
 class Board {
     int boardSize = 8;
-    int currentPlayer = 1;  // Track the current player (p0 or p1), start with player 0
+    int currentPlayer = 1;  // Track the current player (p1 or p2), start with player 1
     bool isOver = false;  // Flag to indicate if the game is over
     int winner = 0;
 
@@ -23,7 +22,7 @@ class Board {
     vector<vector<Square>> board;
     vector<shared_ptr<Player>> players;
     // Constructor:
-    Board(string links1, string links2);
+    Board(string links1, string links2, string abilities1, string abilities2);
     // Accessor:
     int getCurrent() const;
     bool getIsOver() const;
@@ -38,6 +37,7 @@ class Board {
     void moveLink(char letter, Direction dir);  // Move a link on the board
     bool battle(char letter1, char letter2);
     void downloadLink(char letter);
+    bool useAbility(int ID, istream& in); // return whether used an Ability successfully or not
 };
 
 #endif
