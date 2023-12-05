@@ -28,11 +28,30 @@ void Link::setCol(int c) { col = c; }
 void Link::toggleState() {
     isDownload = (isDownload) ? false : true;  // negate the isDownload field
 }
-void Link::toggleVisbility() {
-    visibility = (visibility) ? false : true;
+void Link::toggleVisbility() { visibility = true; }
+void Link::setVisFalse() { 
+    visibility = false; 
 }
 
 void Link::downloaded() {
     toggleState();
     toggleVisbility();
 }
+
+void Link::incStrength() {
+    ++strength;
+}
+
+void Link::setType(char t) {
+    type = t;
+}
+
+void Link::setVis(bool b) {
+    visibility = b;
+}
+
+void Link::setStrength(int s) {
+    strength = s;
+}
+
+

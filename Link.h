@@ -37,6 +37,11 @@ class Link {
     void toggleState();
     void toggleVisbility();
     void downloaded();
+    void incStrength();
+    void setType(char t);
+    void setVis(bool b);
+    void setStrength(int s);
+    void setVisFalse();
 };
 
 #endif

@@ -24,12 +24,18 @@ Square::Square(int r, int c): row{r}, col{c} {
 // Accessor
 int Square::getRow() const { return row; }
 char Square::getContent() const { return content; }
+char Square::getFwContent() const { return fwContent; }
 bool Square::getLinkOn() const { return linkOn; }
 bool Square::getIsSP() const { return isSP; }
+bool Square::getIsFW() const { return isFW; }
 
 // Mutator
 void Square::setContent(char newContent) { content = newContent; }
 void Square::toggleLinkOn() {
     linkOn? linkOn = false : linkOn = true;
 }
+void Square::toggleIsFW() {
+    isFW? isFW = false : isFW = true;
+}
+void Square::setFwContent(char newFW) { fwContent = newFW; }
 

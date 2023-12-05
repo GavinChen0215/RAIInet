@@ -57,28 +57,38 @@ string Display::convert(AbilityName name) {
     else if (name == Firewall) return "Firewall";
     else if (name == Download) return "Download";
     else if (name == Polarize) return "Polarize";
-    else return "Scan";
+    else if (name == Scan) return "Scan";
+    else if (name == BoostStrength) return "BoostStrength";
+    else if (name == ExchangeLocation) return "ExchangeLocation";
+    else return "Taunt";
 }
 
 void Display::printAbilities(int playerNumber) {
-    cout << "              Player " << playerNumber << endl;
-    cout << "----------- ABILITY CARD ------------" << endl;
+    cout << "               Player " << playerNumber << endl;
+    cout << "------------- ABILITY CARD --------------" << endl;
     for (int i = 0; i < 5; ++i) {
         bool isUsed = players[playerNumber - 1]->abilities[i]->getIsUsed();
         string use;
         AbilityName abName = players[playerNumber - 1]->abilities[i]->getName();
         (isUsed)? use = "Yes" : use = "No";
         if (abName == Scan) {
-            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"       Used: "<<use<<endl; // just to make it align => looks better
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"               Used: "<<use<<endl; // just to make it align => looks better
         } else if (abName == LinkBoost) {
-            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"  Used: "<<use<<endl; // just to make it align => looks better
-        } else {
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"          Used: "<<use<<endl; // just to make it align => looks better
+        } else if (abName == BoostStrength) {
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"      Used: "<<use<<endl; // just to make it align => looks better
+        } else if (abName == ExchangeLocation) {
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"   Used: "<<use<<endl; // just to make it align => looks better
+        } else if (abName == Taunt) {
+            cout<<"ID: "<<i+1<<"   Name: "<<convert(abName)<<"              Used: "<<use<<endl; // just to make it align => looks better
+        }
+        else {
             cout << "ID: " << i + 1 <<
             "   Name: " << convert(abName) <<
-            "   Used: " << use << endl;
+            "           Used: " << use << endl;
         }
     }
-    cout << "-------------------------------------" << endl;
+    cout << "-----------------------------------------" << endl;
 }
 
 ostream &operator<<(ostream &out, const Display &display) {

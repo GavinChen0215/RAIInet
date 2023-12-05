@@ -10,6 +10,9 @@ Ability::Ability(int id, char initial): id{id} {
     else if (initial == 'D') name = AbilityName::Download;
     else if (initial == 'P') name = AbilityName::Polarize;
     else if (initial == 'S') name = AbilityName::Scan;
+    else if (initial == 'B') name = AbilityName::BoostStrength;
+    else if (initial == 'E') name = AbilityName::ExchangeLocation;
+    else if (initial == 'T') name = AbilityName::Taunt;
     else cout << "Invalid Ability Name" << endl;
 }
 
